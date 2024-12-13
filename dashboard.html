@@ -49,6 +49,23 @@
             background-color: #d32f2f;
         }
 
+        /* Nút Mở Cửa Khẩn Cấp */
+        #emergencyOpenButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #f44336; /* Màu đỏ để biểu thị khẩn cấp */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #emergencyOpenButton:hover {
+            background-color: #d32f2f;
+        }
+
         .data-container {
             display: flex;
             flex-wrap: wrap;
@@ -386,13 +403,34 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm kiểm tra trạng thái đăng nhập
-        function checkLoginStatus() {
-            // Kiểm tra xem người dùng đã đăng nhập hay chưa
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-            if (isLoggedIn !== 'true') {
-                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
-                window.location.href = 'index.html';
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
+        async function sendEmergencyOpenCommand() {
+            const apiKey = 'YOUR_THINGSPEAK_WRITE_API_KEY'; // Thay bằng API Write Key của bạn
+            const channelID = 'YOUR_CHANNEL_ID'; // Thay bằng Channel ID của bạn
+            const fieldNumber = 4; // Sử dụng field4 cho lệnh
+
+            const url = `https://api.thingspeak.com/update`;
+
+            const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: payload
+                });
+
+                if (response.ok) {
+                    console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                } else {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Lỗi khi gửi lệnh mở cửa:', error);
+                alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
             }
         }
 
@@ -404,16 +442,40 @@
             // Khởi động tự động cập nhật
             startAutoUpdate();
 
-            // Thêm sự kiện click cho nút Đăng Xuất
+            // Thêm sự kiện cho nút "Đăng Xuất"
             const logoutBtn = document.getElementById('logoutButton');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', logout);
             }
 
-            // Thêm sự kiện cho các nút khác
-            document.getElementById('toggleButton').addEventListener('click', toggleTable);
-            document.getElementById('filterButton').addEventListener('click', filterData);
+            // Thêm sự kiện cho nút "Hiển thị danh sách"
+            const toggleBtn = document.getElementById('toggleButton');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', toggleTable);
+            }
+
+            // Thêm sự kiện cho nút "Lọc dữ liệu"
+            const filterBtn = document.getElementById('filterButton');
+            if (filterBtn) {
+                filterBtn.addEventListener('click', filterData);
+            }
+
+            // Thêm sự kiện cho nút "Mở Cửa Khẩn Cấp"
+            const emergencyBtn = document.getElementById('emergencyOpenButton');
+            if (emergencyBtn) {
+                emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
+            }
         });
+
+        // Hàm kiểm tra trạng thái đăng nhập
+        function checkLoginStatus() {
+            // Kiểm tra xem người dùng đã đăng nhập hay chưa
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
+                window.location.href = 'index.html';
+            }
+        }
     </script>
 </head>
 <body>
@@ -448,6 +510,9 @@
 
     <!-- Nút để hiển thị bảng dữ liệu -->
     <button id="toggleButton">Hiển thị danh sách</button>
+
+    <!-- Nút Mở Cửa Khẩn Cấp -->
+    <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
 
     <!-- Bảng dữ liệu -->
     <table id="dataTable">
