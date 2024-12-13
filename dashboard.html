@@ -403,52 +403,34 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-       // Hàm gửi lệnh MỞ/ĐÓNG cửa (ĐÃ SỬA)
-       async function sendEmergencyOpenCommand() {
-            const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay BẰNG Write API Key của bạn
-            const channelID = '2783657'; // Thay BẰNG Channel ID của bạn
-            const fieldNumber = 4; // Field để điều khiển relay (field4)
-            const closeDelay = 5000; // 5 giây
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
+        async function sendEmergencyOpenCommand() {
+            const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
+            const fieldNumber = 4; // Sử dụng field4 cho lệnh
 
             const url = `https://api.thingspeak.com/update`;
 
+            const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
+
             try {
-                // 1. Gửi lệnh MỞ cửa (ghi "1" vào field)
-                let payload = `api_key=${apiKey}&field${fieldNumber}=1`;
-                let response = await fetch(url, {
+                const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
                     body: payload
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Lỗi khi gửi lệnh mở: ${response.status}`);
+                if (response.ok) {
+                    console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                } else {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-
-                alert('Cửa đang mở...');
-                console.log('Đã gửi lệnh MỞ lên ThingSpeak.');
-
-                // 2. Chờ 5 giây
-                await new Promise(resolve => setTimeout(resolve, closeDelay));
-
-                // 3. Gửi lệnh ĐÓNG cửa (ghi "0" vào field)
-                payload = `api_key=${apiKey}&field${fieldNumber}=0`; // Ghi 0 để đóng
-                response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: payload
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Lỗi khi gửi lệnh đóng: ${response.status}`);
-                }
-
-                alert('Cửa đã đóng.');
-                console.log('Đã gửi lệnh ĐÓNG lên ThingSpeak.');
-
             } catch (error) {
-                console.error('Lỗi điều khiển cửa:', error);
-                alert('Lỗi điều khiển cửa.');
+                console.error('Lỗi khi gửi lệnh mở cửa:', error);
+                alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
             }
         }
 
