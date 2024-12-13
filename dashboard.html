@@ -1,31 +1,5 @@
-
 <!DOCTYPE html>
 <html lang="vi">
-<script>
-    // Hàm để đăng xuất người dùng
-    function logout() {
-        // Xóa trạng thái đăng nhập khỏi sessionStorage
-        sessionStorage.removeItem('isLoggedIn');
-        // Hoặc bạn có thể xóa toàn bộ sessionStorage nếu không cần giữ dữ liệu khác
-        // sessionStorage.clear();
-        
-        // Chuyển hướng người dùng về trang đăng nhập
-        window.location.href = 'index.html';
-    }
-
-    // Thêm sự kiện click cho nút Đăng Xuất
-    document.getElementById('logoutButton').addEventListener('click', logout);
-
-    // (Tùy chọn) Kiểm tra trạng thái đăng nhập khi tải trang
-    window.onload = function() {
-        // Kiểm tra xem người dùng đã đăng nhập hay chưa
-        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-        if (isLoggedIn !== 'true') {
-            // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
-            window.location.href = 'index.html';
-        }
-    };
-</script>
 <head>
     <meta charset="UTF-8">
     <title>Dashboard Cập Nhật Tự Động</title>
@@ -52,6 +26,27 @@
             color: #333;
             margin-bottom: 30px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Nút Đăng Xuất */
+        #logoutButton {
+            padding: 8px 16px;
+            font-size: 1em;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #logoutButton:hover {
+            background-color: #d32f2f;
         }
 
         .data-container {
@@ -196,6 +191,17 @@
     </style>
     <script>
         let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
+
+        // Hàm để đăng xuất người dùng
+        function logout() {
+            // Xóa trạng thái đăng nhập khỏi sessionStorage
+            sessionStorage.removeItem('isLoggedIn');
+            // Hoặc bạn có thể xóa toàn bộ sessionStorage nếu không cần giữ dữ liệu khác
+            // sessionStorage.clear();
+            
+            // Chuyển hướng người dùng về trang đăng nhập
+            window.location.href = 'index.html';
+        }
 
         // Hàm để tạo hàng mới trong bảng
         function addRowToTable(field1, field2, timestamp) {
@@ -380,15 +386,41 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        window.onload = function() {
+        // Hàm kiểm tra trạng thái đăng nhập
+        function checkLoginStatus() {
+            // Kiểm tra xem người dùng đã đăng nhập hay chưa
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Khi trang tải
+        window.addEventListener('load', function() {
+            // Kiểm tra đăng nhập
+            checkLoginStatus();
+
+            // Khởi động tự động cập nhật
             startAutoUpdate();
+
+            // Thêm sự kiện click cho nút Đăng Xuất
+            const logoutBtn = document.getElementById('logoutButton');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
+
+            // Thêm sự kiện cho các nút khác
             document.getElementById('toggleButton').addEventListener('click', toggleTable);
             document.getElementById('filterButton').addEventListener('click', filterData);
-        };
+        });
     </script>
 </head>
 <body>
-    <h1>Dashboard ThingSpeak</h1>
+    <h1>
+        Dashboard ThingSpeak
+        <button id="logoutButton">Đăng Xuất</button>
+    </h1>
     <div class="data-container">
         <div class="data-item">
             <h2>ESP ID</h2>
