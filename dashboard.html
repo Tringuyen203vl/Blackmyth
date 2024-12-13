@@ -425,7 +425,20 @@
         if (response.ok) {
           console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
           alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-            
+
+          // Gửi lệnh xóa sau khi gửi lệnh mở cửa
+          const clearCommandPayload = `api_key=${apiKey}&field${fieldNumber}=`;
+          try {
+            const clearResponse = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: clearCommandPayload
+            });
+
+            if (clearResponse.ok) {
+              console.log('Lệnh xóa đã được gửi thành công.');
             } else {
               console.error('Lỗi khi gửi lệnh xóa:', clearResponse.status);
             }
