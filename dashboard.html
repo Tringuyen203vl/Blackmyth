@@ -405,8 +405,8 @@
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
         async function sendEmergencyOpenCommand() {
-            const apiKey = 'YOUR_THINGSPEAK_WRITE_API_KEY'; // Thay bằng API Write Key của bạn
-            const channelID = 'YOUR_CHANNEL_ID'; // Thay bằng Channel ID của bạn
+            const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
             const fieldNumber = 4; // Sử dụng field4 cho lệnh
 
             const url = `https://api.thingspeak.com/update`;
