@@ -403,36 +403,57 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
-        async function sendEmergencyOpenCommand() {
-            const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
-            const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
-            const fieldNumber = 4; // Sử dụng field4 cho lệnh
+       // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
+    async function sendEmergencyOpenCommand() {
+      const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
+      const channelID = '2783657'; // Thay bằng Channel ID của bạn 
+      const fieldNumber = 4; // Sử dụng field4 cho lệnh
 
-            const url = `https://api.thingspeak.com/update`;
+      const url = `https://api.thingspeak.com/update`;
 
-            const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
+      // Gửi lệnh "open_door"
+      const openDoorPayload = `api_key=${apiKey}&field${fieldNumber}=open_door`; 
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: openDoorPayload
+        });
 
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: payload
-                });
+        if (response.ok) {
+          console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+          alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
 
-                if (response.ok) {
-                    console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-                } else {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-            } catch (error) {
-                console.error('Lỗi khi gửi lệnh mở cửa:', error);
-                alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
+          // Gửi lệnh xóa sau khi gửi lệnh mở cửa
+          const clearCommandPayload = `api_key=${apiKey}&field${fieldNumber}=`;
+          try {
+            const clearResponse = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: clearCommandPayload
+            });
+
+            if (clearResponse.ok) {
+              console.log('Lệnh xóa đã được gửi thành công.');
+            } else {
+              console.error('Lỗi khi gửi lệnh xóa:', clearResponse.status);
             }
+          } catch (error) {
+            console.error('Lỗi khi gửi lệnh xóa:', error);
+          }
+
+        } else {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
+      } catch (error) {
+        console.error('Lỗi khi gửi lệnh mở cửa:', error);
+        alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
+      }
+    }
 
         // Khi trang tải
         window.addEventListener('load', function() {
