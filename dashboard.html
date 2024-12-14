@@ -406,21 +406,13 @@
         function sendEmergencyOpenCommand() {
             const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
 
-            // Gửi yêu cầu GET tới ESP32 mà không rời khỏi trang hiện tại
-            fetch(esp32URL, { method: 'GET' })
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Emergency open command sent successfully.');
-                        alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-                    } else {
-                        console.error('Failed to send emergency open command.');
-                        alert('Gửi lệnh mở cửa khẩn cấp không thành công.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error sending emergency open command:', error);
-                    alert('Có lỗi xảy ra khi gửi lệnh mở cửa khẩn cấp.');
-                });
+            // Mở ESP32 endpoint để kích hoạt mở cửa
+            window.location.href = esp32URL;
+
+            // Sau 1 giây, quay lại dashboard.html
+            setTimeout(function() {
+                window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
+            }, 1000); // 1000 milliseconds = 1 giây
         }
 
         // Khi trang tải
