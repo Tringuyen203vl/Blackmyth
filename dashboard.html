@@ -405,17 +405,20 @@
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32
         async function sendEmergencyOpenCommand() {
-            const esp32IP = 'ESP32_IP_ADDRESS'; // Thay bằng địa chỉ IP của ESP32
-            const apiKey = 'YOUR_API_KEY'; // Thay bằng khóa API bạn đã định nghĩa
-            const url = `http://${esp32IP}/emergency_open?api_key=${apiKey}`;
+            const espIP = '192.168.1.100'; // <--- Thay bằng địa chỉ IP của ESP32 của bạn
+            const url = `http://${espIP}/open_door`;
 
             try {
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    }
+                });
+
                 if (response.ok) {
                     console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
                     alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-                } else if (response.status === 401) {
-                    throw new Error('Unauthorized');
                 } else {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
