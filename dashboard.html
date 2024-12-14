@@ -403,17 +403,23 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
         async function sendEmergencyOpenCommand() {
-            const espIP = '192.168.1.9'; // <--- Thay bằng địa chỉ IP của ESP32 của bạn
-            const url = `http://${espIP}/open_door`;
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn
+            const writeAPIKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
+            const fieldNumber = 4; // field4 cho lệnh mở cửa khẩn cấp
+
+            const url = `https://api.thingspeak.com/update`;
+
+            const payload = `api_key=${writeAPIKey}&field${fieldNumber}=open_door`;
 
             try {
                 const response = await fetch(url, {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
-                        'Content-Type': 'text/plain'
-                    }
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: payload
                 });
 
                 if (response.ok) {
