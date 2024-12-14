@@ -272,7 +272,8 @@
                         lastEntryID = latestFeed.entry_id;
                     }
                 }
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('field1').innerText = 'Lỗi';
                 document.getElementById('field2').innerText = 'Lỗi';
@@ -329,7 +330,8 @@
 
                 // Hiển thị bảng dữ liệu
                 document.getElementById('dataTable').style.display = 'table';
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi lấy dữ liệu lịch sử:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi lọc dữ liệu.';
                 // Ẩn bảng nếu có lỗi
@@ -399,7 +401,7 @@
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32
         async function sendEmergencyOpenCommand() {
-            const esp32IP = 'ESP001'; // Thay bằng địa chỉ IP của ESP32 của bạn
+            const esp32IP = '192.168.1.10'; // Thay bằng địa chỉ IP thực tế của ESP32
             const url = `http://${esp32IP}/open_door`;
 
             try {
@@ -410,7 +412,8 @@
                 const text = await response.text();
                 console.log('Phản hồi từ ESP32:', text);
                 alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi gửi lệnh mở cửa:', error);
                 alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
             }
