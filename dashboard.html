@@ -272,8 +272,7 @@
                         lastEntryID = latestFeed.entry_id;
                     }
                 }
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('field1').innerText = 'Lỗi';
                 document.getElementById('field2').innerText = 'Lỗi';
@@ -330,8 +329,7 @@
 
                 // Hiển thị bảng dữ liệu
                 document.getElementById('dataTable').style.display = 'table';
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu lịch sử:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi lọc dữ liệu.';
                 // Ẩn bảng nếu có lỗi
@@ -399,24 +397,61 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
         async function sendEmergencyOpenCommand() {
-            const esp32IP = '192.168.1.10'; // Thay bằng địa chỉ IP thực tế của ESP32
+            const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
+            const fieldNumber = 4; // Sử dụng field4 cho lệnh
+
+            const url = 'https://api.thingspeak.com/update';
+
+            const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: payload
+                });
+
+                if (response.ok) {
+                    console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                } else {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Lỗi khi gửi lệnh mở cửa:', error);
+                alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
+            }
+        }
+
+        // Hàm để mở cửa khẩn cấp trực tiếp thông qua web server ESP32
+        async function sendEmergencyOpenDirect() {
+            const esp32IP = '192.168.1.10'; // Thay bằng địa chỉ IP của ESP32
             const url = `http://${esp32IP}/open_door`;
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) {
+                if (response.ok) {
+                    const text = await response.text();
+                    console.log('Phản hồi từ ESP32:', text);
+                    alert('Cửa đã được mở khẩn cấp.');
+                } else {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-                const text = await response.text();
-                console.log('Phản hồi từ ESP32:', text);
-                alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+            } catch (error) {
+                console.error('Lỗi khi gửi yêu cầu mở cửa trực tiếp:', error);
+                alert('Có lỗi xảy ra khi mở cửa khẩn cấp.');
             }
-            catch (error) {
-                console.error('Lỗi khi gửi lệnh mở cửa:', error);
-                alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
-            }
+        }
+
+        // Hàm để khởi động quá trình tự động cập nhật
+        function startAutoUpdate() {
+            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
+            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
         }
 
         // Khi trang tải
@@ -425,8 +460,7 @@
             checkLoginStatus();
 
             // Khởi động tự động cập nhật
-            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
-            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
+            startAutoUpdate();
 
             // Thêm sự kiện cho nút "Đăng Xuất"
             const logoutBtn = document.getElementById('logoutButton');
@@ -449,7 +483,8 @@
             // Thêm sự kiện cho nút "Mở Cửa Khẩn Cấp"
             const emergencyBtn = document.getElementById('emergencyOpenButton');
             if (emergencyBtn) {
-                emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
+                // Sử dụng hàm mới để gửi yêu cầu trực tiếp đến ESP32
+                emergencyBtn.addEventListener('click', sendEmergencyOpenDirect);
             }
         });
 
