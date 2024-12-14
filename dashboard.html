@@ -205,6 +205,13 @@
             font-size: 1em;
             color: red;
         }
+
+        /* Status Message Styling */
+        .status-message {
+            margin-top: 15px;
+            font-size: 1em;
+            color: green;
+        }
     </style>
     <script>
         let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
@@ -406,14 +413,16 @@
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
         async function sendEmergencyOpenCommand() {
             const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
-            const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
             const fieldNumber = 4; // Sử dụng field4 cho lệnh
 
             const url = `https://api.thingspeak.com/update`;
 
             const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
 
+            const statusDiv = document.getElementById('emergencyStatus');
+
             try {
+                console.log('Đang gửi lệnh mở cửa khẩn cấp...');
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -424,13 +433,15 @@
 
                 if (response.ok) {
                     console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                    statusDiv.innerText = 'Lệnh mở cửa khẩn cấp đã được gửi thành công.';
+                    statusDiv.style.color = 'green';
                 } else {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
             } catch (error) {
                 console.error('Lỗi khi gửi lệnh mở cửa:', error);
-                alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
+                statusDiv.innerText = 'Có lỗi xảy ra khi gửi lệnh mở cửa.';
+                statusDiv.style.color = 'red';
             }
         }
 
@@ -513,6 +524,9 @@
 
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
+    
+    <!-- Hiển thị trạng thái lệnh mở cửa khẩn cấp -->
+    <div id="emergencyStatus" class="status-message"></div>
 
     <!-- Bảng dữ liệu -->
     <table id="dataTable">
