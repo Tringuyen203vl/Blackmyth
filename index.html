@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background-image: url('https://www.most.gov.vn/Images/editor/images/h4ttnt.jpg');
+            background-image: url(https://mega.com.vn/media/news/2605_hinh-nen-cong-nghe-pc43.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -108,24 +108,26 @@
             100% { transform: translate(-100%, 0); }
         }
 
-        /* Footer Icons */
+        /* Footer Icons (Social Media logos) */
         .social-icons {
-            margin-top: 20px;
+            position: absolute;
+            bottom: 30px;
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 20px;
+            width: 100%;
         }
 
         .social-icons a {
             display: inline-block;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             background-color: #4CAF50;
             border-radius: 50%;
             text-align: center;
-            line-height: 40px;
+            line-height: 50px;
             color: white;
-            font-size: 1.5em;
+            font-size: 1.8em; /* Lớn hơn chữ cái để hiển thị dễ dàng */
             text-decoration: none;
             transition: background-color 0.3s;
         }
@@ -134,17 +136,13 @@
             background-color: #45a049;
         }
 
-        /* Footer content */
-        .footer-content a {
-            color: #4CAF50;
-            text-decoration: none;
-            margin: 0 15px;
-            font-weight: bold;
-        }
+        .social-icons a.facebook { background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg'); background-size: contain; background-position: center; background-repeat: no-repeat; }
+        .social-icons a.youtube { background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a7/YouTube_icon_%282013-2017%29.png'); background-size: contain; background-position: center; background-repeat: no-repeat; }
+        .social-icons a.instagram { background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/95/Instagram_logo_2022.svg'); background-size: contain; background-position: center; background-repeat: no-repeat; }
+        .social-icons a.x { background-image: url('https://upload.wikimedia.org/wikipedia/commons/6/66/Twitter_Logo_2021.svg'); background-size: contain; background-position: center; background-repeat: no-repeat; }
+        .social-icons a.yahoo { background-image: url('https://upload.wikimedia.org/wikipedia/commons/6/66/Yahoo_Logo.svg'); background-size: contain; background-position: center; background-repeat: no-repeat; }
+        .social-icons a.gmail { background-image: url('https://upload.wikimedia.org/wikipedia/commons/4/42/Gmail_Logo_2020.png'); background-size: contain; background-position: center; background-repeat: no-repeat; }
 
-        .footer-content a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -176,12 +174,12 @@
 
     <!-- Social Icons -->
     <div class="social-icons">
-        <a href="https://facebook.com" target="_blank">F</a>
-        <a href="https://youtube.com" target="_blank">Y</a>
-        <a href="https://instagram.com" target="_blank">I</a>
-        <a href="https://twitter.com" target="_blank">X</a>
-        <a href="https://mail.yahoo.com" target="_blank">Y!</a>
-        <a href="https://mail.google.com" target="_blank">G</a>
+        <a href="https://facebook.com" target="_blank" class="facebook"></a>
+        <a href="https://youtube.com" target="_blank" class="youtube"></a>
+        <a href="https://instagram.com" target="_blank" class="instagram"></a>
+        <a href="https://twitter.com" target="_blank" class="x"></a>
+        <a href="https://mail.yahoo.com" target="_blank" class="yahoo"></a>
+        <a href="https://mail.google.com" target="_blank" class="gmail"></a>
     </div>
 
     <script>
