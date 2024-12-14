@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard ThingSpeak</title>
+    <title>Dashboard Cập Nhật Tự Động</title>
     <style>
         /* Reset một số thiết lập mặc định */
         * {
@@ -205,14 +205,6 @@
             font-size: 1em;
             color: red;
         }
-
-        /* Thêm thông báo khi gửi lệnh mở cửa */
-        #emergencyStatus {
-            margin-top: 10px;
-            font-size: 1em;
-            color: green;
-            text-align: center;
-        }
     </style>
     <script>
         let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
@@ -352,40 +344,23 @@
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
-                
-                // Lấy giá trị ngày từ các input
-                const startDateInput = document.getElementById('startDate').value.trim();
-                const endDateInput = document.getElementById('endDate').value.trim();
-                
-                let startDate, endDate;
-                
-                if (startDateInput && endDateInput) {
-                    startDate = convertDateFormat(startDateInput);
-                    endDate = convertDateFormat(endDateInput);
-                    if (!startDate || !endDate) {
-                        document.getElementById('filterMessage').innerText = 'Định dạng ngày không hợp lệ.';
-                        return;
-                    }
+                const startDate = document.getElementById('startDate').value.trim();
+                const endDate = document.getElementById('endDate').value.trim();
+                if (startDate && endDate) {
+                    await filterData(); // Sử dụng hàm lọc hiện tại
                 } else {
-                    // Sử dụng khoảng thời gian mặc định, ví dụ: 7 ngày gần nhất
+                    // Sử dụng một khoảng thời gian mặc định, ví dụ: 7 ngày gần nhất
                     const today = new Date();
-                    const priorDate = new Date();
-                    priorDate.setDate(today.getDate() - 7);
-                    startDate = priorDate.toISOString().split('T')[0];
-                    endDate = today.toISOString().split('T')[0];
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(today.getDate() - 7);
+                    const formattedStartDate = sevenDaysAgo.toISOString().split('T')[0];
+                    const formattedEndDate = today.toISOString().split('T')[0];
+                    await fetchHistoricalData(formattedStartDate, formattedEndDate);
                 }
-                
-                await fetchHistoricalData(startDate, endDate);
             } else {
                 dataTable.style.display = 'none';
                 toggleButton.innerText = 'Hiển thị danh sách';
             }
-        }
-
-        // Hàm để khởi động quá trình tự động cập nhật
-        function startAutoUpdate() {
-            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
-            setInterval(fetchData, 10000); // Lấy dữ liệu mỗi 10 giây
         }
 
         // Hàm để chuyển đổi định dạng ngày từ dd/mm/yyyy sang yyyy-mm-dd
@@ -434,42 +409,23 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
+        // Hàm để gửi lệnh mở cửa khẩn cấp (đổi từ ThingSpeak sang gọi trực tiếp ESP32)
         async function sendEmergencyOpenCommand() {
-            const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
-            const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
-            const fieldNumber = 4; // Sử dụng field4 cho lệnh
-
-            const url = `https://api.thingspeak.com/update`;
-
-            const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
-
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: payload
-                });
-
+                // Thay địa chỉ IP dưới đây bằng địa chỉ IP thực tế của ESP32 trong mạng của bạn
+                const esp32IP = '192.168.1.100'; // <---- Thay bằng IP của ESP32
+                const response = await fetch(`http://${esp32IP}/emergency_open`);
+                
                 if (response.ok) {
-                    console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-                    document.getElementById('emergencyStatus').innerText = 'Lệnh mở cửa khẩn cấp đã được gửi!';
-                    setTimeout(() => {
-                        document.getElementById('emergencyStatus').innerText = '';
-                    }, 5000); // Xóa thông báo sau 5 giây
+                    const result = await response.text();
+                    console.log('Kết quả:', result);
+                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công (Local WebServer).');
                 } else {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
             } catch (error) {
                 console.error('Lỗi khi gửi lệnh mở cửa:', error);
                 alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
-                document.getElementById('emergencyStatus').innerText = 'Lỗi khi gửi lệnh!';
-                setTimeout(() => {
-                    document.getElementById('emergencyStatus').innerText = '';
-                }, 5000); // Xóa thông báo sau 5 giây
             }
         }
 
@@ -479,7 +435,8 @@
             checkLoginStatus();
 
             // Khởi động tự động cập nhật
-            startAutoUpdate();
+            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
+            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
 
             // Thêm sự kiện cho nút "Đăng Xuất"
             const logoutBtn = document.getElementById('logoutButton');
@@ -540,9 +497,9 @@
     <!-- Thanh nhập ngày và nút lọc dữ liệu -->
     <div class="filter-container">
         <label for="startDate">Ngày bắt đầu:</label>
-        <input type="date" id="startDate">
+        <input type="text" id="startDate" placeholder="dd/mm/yyyy">
         <label for="endDate">Ngày kết thúc:</label>
-        <input type="date" id="endDate">
+        <input type="text" id="endDate" placeholder="dd/mm/yyyy">
         <button id="filterButton">Lọc dữ liệu</button>
         <div id="filterMessage" class="filter-message"></div>
     </div>
@@ -552,7 +509,6 @@
 
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
-    <div id="emergencyStatus"></div> <!-- Thêm div để hiển thị trạng thái lệnh -->
 
     <!-- Bảng dữ liệu -->
     <table id="dataTable">
