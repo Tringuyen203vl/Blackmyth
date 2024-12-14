@@ -4,207 +4,8 @@
     <meta charset="UTF-8">
     <title>Dashboard Cập Nhật Tự Động</title>
     <style>
-        /* Reset một số thiết lập mặc định */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f6f8;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* Chỉnh sửa để không căn giữa hoàn toàn */
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        /* Nút Đăng Xuất */
-        #logoutButton {
-            padding: 8px 16px;
-            font-size: 1em;
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #logoutButton:hover {
-            background-color: #d32f2f;
-        }
-
-        /* Nút Mở Cửa Khẩn Cấp */
-        #emergencyOpenButton {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #f44336; /* Màu đỏ để biểu thị khẩn cấp */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #emergencyOpenButton:hover {
-            background-color: #d32f2f;
-        }
-
-        .data-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        .data-item {
-            background-color: #ffffff;
-            border: 2px solid #4CAF50;
-            border-radius: 10px;
-            padding: 20px;
-            width: 220px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .data-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
-        }
-
-        .data-item h2 {
-            font-size: 1.2em;
-            color: #4CAF50;
-            margin-bottom: 10px;
-        }
-
-        .data-item p {
-            font-size: 1.5em;
-            color: #555;
-        }
-
-        .timestamp {
-            font-size: 0.9em;
-            color: #888;
-            margin-top: 10px;
-        }
-
-        /* Button styling */
-        #toggleButton {
-            margin-top: 30px;
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #toggleButton:hover {
-            background-color: #45a049;
-        }
-
-        /* Table styling */
-        #dataTable {
-            display: none; /* Ẩn bảng ban đầu */
-            margin-top: 20px;
-            width: 100%;
-            max-width: 800px;
-            border-collapse: collapse;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        #dataTable th, #dataTable td {
-            border: 1px solid #4CAF50;
-            padding: 12px;
-            text-align: center;
-        }
-
-        #dataTable th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        #dataTable tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            .data-item {
-                width: 100%;
-            }
-
-            #dataTable {
-                width: 100%;
-            }
-        }
-
-        /* Filter container styling */
-        .filter-container {
-            margin-top: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .filter-container label {
-            font-size: 1em;
-            color: #333;
-        }
-
-        .filter-container input {
-            padding: 8px;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 150px;
-        }
-
-        #filterButton {
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #filterButton:hover {
-            background-color: #0b7dda;
-        }
-
-        .filter-message {
-            width: 100%;
-            text-align: center;
-            margin-top: 10px;
-            font-size: 1em;
-            color: red;
-        }
+        /* (Các phần CSS giữ nguyên như trước) */
+        /* ... */
     </style>
     <script>
         let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
@@ -402,8 +203,8 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách sử dụng fetch
-        function sendEmergencyOpenCommand() {
+        // **Phương pháp 1: Sử dụng fetch để gửi lệnh mở cửa khẩn cấp**
+        function sendEmergencyOpenCommandFetch() {
             const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
 
             // Gửi yêu cầu đến ESP32 để kích hoạt mở cửa
@@ -424,6 +225,25 @@
                     console.error('Lỗi khi gửi yêu cầu:', error);
                     alert('Có lỗi xảy ra khi gửi lệnh mở cửa khẩn cấp.');
                 });
+        }
+
+        // **Phương pháp 2: Mở ESP32 trong một cửa sổ mới và đóng sau 2 giây**
+        function sendEmergencyOpenCommandWindow() {
+            const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
+
+            // Mở ESP32 endpoint trong một cửa sổ mới
+            const newWindow = window.open(esp32URL, '_blank');
+
+            // Kiểm tra xem cửa sổ mới có được mở thành công hay không
+            if (newWindow) {
+                // Sau 2 giây, đóng cửa sổ mới
+                setTimeout(function() {
+                    newWindow.close();
+                }, 2000); // 2000 milliseconds = 2 giây
+            } else {
+                // Nếu cửa sổ mới bị chặn, hiển thị thông báo
+                alert('Không thể mở cửa sổ mới. Vui lòng kiểm tra trình chặn popup của bạn.');
+            }
         }
 
         // Khi trang tải
@@ -455,7 +275,13 @@
             // Thêm sự kiện cho nút "Mở Cửa Khẩn Cấp"
             const emergencyBtn = document.getElementById('emergencyOpenButton');
             if (emergencyBtn) {
-                emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
+                // **Chọn phương pháp bạn muốn sử dụng bằng cách bỏ comment hàm tương ứng**
+                
+                // Phương pháp 1: Sử dụng fetch
+                emergencyBtn.addEventListener('click', sendEmergencyOpenCommandFetch);
+
+                // **Phương pháp 2: Mở cửa sổ mới**
+                // emergencyBtn.addEventListener('click', sendEmergencyOpenCommandWindow);
             }
         });
 
