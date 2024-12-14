@@ -217,8 +217,7 @@
             // sessionStorage.clear();
             
             // Chuyển hướng người dùng về trang đăng nhập
-                    window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
-
+            window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
         }
 
         // Hàm để tạo hàng mới trong bảng
@@ -404,28 +403,19 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32
         async function sendEmergencyOpenCommand() {
-            const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
-            const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
-            const fieldNumber = 4; // Sử dụng field4 cho lệnh
-
-            const url = `https://api.thingspeak.com/update`;
-
-            const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
+            const esp32IP = 'ESP32_IP_ADDRESS'; // Thay bằng địa chỉ IP của ESP32
+            const apiKey = 'YOUR_API_KEY'; // Thay bằng khóa API bạn đã định nghĩa
+            const url = `http://${esp32IP}/emergency_open?api_key=${apiKey}`;
 
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: payload
-                });
-
+                const response = await fetch(url);
                 if (response.ok) {
                     console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
                     alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                } else if (response.status === 401) {
+                    throw new Error('Unauthorized');
                 } else {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
@@ -475,7 +465,6 @@
             if (isLoggedIn !== 'true') {
                 // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
                 window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
-
             }
         }
     </script>
