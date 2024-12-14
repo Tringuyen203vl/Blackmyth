@@ -431,7 +431,7 @@
         // Hàm để mở cửa khẩn cấp trực tiếp thông qua web server ESP32
         async function sendEmergencyOpenDirect() {
             const esp32IP = '192.168.1.10'; // Thay bằng địa chỉ IP của ESP32
-            const url = `http://${esp32IP}/open_door`;
+            const url = `http://192.168.1.10/open_door`;
 
             try {
                 const response = await fetch(url);
