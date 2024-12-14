@@ -217,7 +217,7 @@
             // sessionStorage.clear();
             
             // Chuyển hướng người dùng về trang đăng nhập
-            window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
+            window.location.href = https://tringuyen203vl.github.io/Blackmyth/';
         }
 
         // Hàm để tạo hàng mới trong bảng
@@ -430,8 +430,8 @@
 
         // Hàm để mở cửa khẩn cấp trực tiếp thông qua web server ESP32
         async function sendEmergencyOpenDirect() {
-            const esp32IP = '192.168.1.10'; // Thay bằng địa chỉ IP của ESP32
-            const url = `http://192.168.1.10/open_door`;
+            const esp32IP = '192.168.1.10'; // Đã cập nhật địa chỉ IP đúng
+            const url = `http://${esp32IP}/open_door`;
 
             try {
                 const response = await fetch(url);
