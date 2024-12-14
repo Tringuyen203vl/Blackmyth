@@ -402,17 +402,28 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách sử dụng fetch
         function sendEmergencyOpenCommand() {
             const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
 
-            // Mở ESP32 endpoint để kích hoạt mở cửa
-            window.location.href = esp32URL;
-
-            // Sau 1 giây, quay lại dashboard.html
-            setTimeout(function() {
-                window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
-            }, 1000); // 1000 milliseconds = 1 giây
+            // Gửi yêu cầu đến ESP32 để kích hoạt mở cửa
+            fetch(esp32URL)
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Đã gửi lệnh mở cửa khẩn cấp.');
+                        // Hiển thị thông báo thành công sau 2 giây
+                        setTimeout(function() {
+                            alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                        }, 2000);
+                    } else {
+                        console.error('Lỗi khi gửi lệnh mở cửa.');
+                        alert('Lỗi khi gửi lệnh mở cửa khẩn cấp.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    alert('Có lỗi xảy ra khi gửi lệnh mở cửa khẩn cấp.');
+                });
         }
 
         // Khi trang tải
