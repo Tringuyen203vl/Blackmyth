@@ -217,7 +217,7 @@
             // sessionStorage.clear();
             
             // Chuyển hướng người dùng về trang đăng nhập
-            window.location.href = 'index.html';
+            window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
         }
 
         // Hàm để tạo hàng mới trong bảng
@@ -344,7 +344,12 @@
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
-                await fetchHistoricalData(); // Lấy dữ liệu lịch sử khi bảng được hiển thị
+                // Lấy giá trị ngày hiện tại hoặc mặc định
+                const startDateInput = document.getElementById('startDate').value.trim() || '01/01/2023';
+                const endDateInput = document.getElementById('endDate').value.trim() || '31/12/2023';
+                const startDate = convertDateFormat(startDateInput);
+                const endDate = convertDateFormat(endDateInput);
+                await fetchHistoricalData(startDate, endDate);
             } else {
                 dataTable.style.display = 'none';
                 toggleButton.innerText = 'Hiển thị danh sách';
@@ -403,7 +408,7 @@
             const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
             const fieldNumber = 4; // Sử dụng field4 cho lệnh
 
-            const url = 'https://api.thingspeak.com/update';
+            const url = `https://api.thingspeak.com/update`;
 
             const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
 
@@ -426,32 +431,6 @@
                 console.error('Lỗi khi gửi lệnh mở cửa:', error);
                 alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
             }
-        }
-
-        // Hàm để mở cửa khẩn cấp trực tiếp thông qua web server ESP32
-        async function sendEmergencyOpenDirect() {
-            const esp32IP = '192.168.1.10'; // Đã cập nhật địa chỉ IP đúng
-            const url = `http://${esp32IP}/open_door`;
-
-            try {
-                const response = await fetch(url);
-                if (response.ok) {
-                    const text = await response.text();
-                    console.log('Phản hồi từ ESP32:', text);
-                    alert('Cửa đã được mở khẩn cấp.');
-                } else {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-            } catch (error) {
-                console.error('Lỗi khi gửi yêu cầu mở cửa trực tiếp:', error);
-                alert('Có lỗi xảy ra khi mở cửa khẩn cấp.');
-            }
-        }
-
-        // Hàm để khởi động quá trình tự động cập nhật
-        function startAutoUpdate() {
-            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
-            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
         }
 
         // Khi trang tải
@@ -483,8 +462,7 @@
             // Thêm sự kiện cho nút "Mở Cửa Khẩn Cấp"
             const emergencyBtn = document.getElementById('emergencyOpenButton');
             if (emergencyBtn) {
-                // Sử dụng hàm mới để gửi yêu cầu trực tiếp đến ESP32
-                emergencyBtn.addEventListener('click', sendEmergencyOpenDirect);
+                emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
             }
         });
 
@@ -494,8 +472,14 @@
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             if (isLoggedIn !== 'true') {
                 // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
-                window.location.href = 'index.html';
+                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
             }
+        }
+
+        // Hàm để khởi động quá trình tự động cập nhật
+        function startAutoUpdate() {
+            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
+            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
         }
     </script>
 </head>
