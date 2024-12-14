@@ -405,7 +405,7 @@
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server
         async function sendEmergencyOpenCommand() {
             const esp32IP = '192.168.1.10'; // Thay bằng địa chỉ IP của ESP32 trên mạng WiFi của bạn
-            const url = `http://${esp32IP}/emergency_open`;
+            const url = `http://192.168.1.10/emergency_open`;
 
             try {
                 const response = await fetch(url);
