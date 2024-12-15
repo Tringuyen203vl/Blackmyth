@@ -25,7 +25,6 @@
             min-height: 100vh;
             padding: 20px;
             position: relative; /* Để chứa thanh thông tin chạy */
-            padding-bottom: 60px; /* Đảm bảo không bị chồng bởi running-info */
         }
 
         h1 {
@@ -139,8 +138,6 @@
             border-collapse: collapse;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
-            z-index: 1001; /* Cao hơn running-info */
-            position: relative;
         }
 
         #dataTable th, #dataTable td {
@@ -226,7 +223,6 @@
             white-space: nowrap;
             box-sizing: border-box;
             padding: 10px 0;
-            z-index: 1000; /* Đảm bảo thông tin chạy trên cùng */
         }
 
         .running-text {
@@ -321,19 +317,18 @@
 
         // Hàm để lấy dữ liệu lịch sử và tạo bảng
         async function fetchHistoricalData(startDate, endDate) {
-            console.log(`fetchHistoricalData called with startDate: ${startDate}, endDate: ${endDate}`);
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
 
-            // Kiểm tra nếu startDate hoặc endDate không hợp lệ
-            if (!startDate || !endDate) {
-                console.error('Ngày bắt đầu hoặc ngày kết thúc không hợp lệ.');
-                return;
+            // Nếu startDate và endDate giống nhau, đặt endDateTime là cuối ngày
+            let endDateTime = endDate;
+            if (startDate === endDate) {
+                endDateTime = `${endDate}T23:59:59Z`;
+            } else {
+                endDateTime = `${endDate}T23:59:59Z`;
             }
 
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDate}T00:00:00Z&end=${endDate}T23:59:59Z&timezone=UTC`;
-
-            console.log(`Fetching historical data from ${url}`);
+            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDate}T00:00:00Z&end=${endDateTime}&timezone=UTC`;
 
             try {
                 const response = await fetch(url);
@@ -382,18 +377,25 @@
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
-                console.log('Hiển thị bảng dữ liệu');
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
-                // Lấy giá trị ngày hiện tại hoặc mặc định
+                
+                // Lấy giá trị ngày từ input hoặc sử dụng ngày mặc định nếu chưa nhập
                 const startDateInput = document.getElementById('startDate').value.trim() || '01/01/2023';
                 const endDateInput = document.getElementById('endDate').value.trim() || '31/12/2023';
                 const startDate = convertDateFormat(startDateInput);
                 const endDate = convertDateFormat(endDateInput);
-                console.log(`Start Date: ${startDate}, End Date: ${endDate}`);
+
+                // Kiểm tra định dạng ngày
+                if (!startDate || !endDate) {
+                    document.getElementById('filterMessage').style.color = 'red';
+                    document.getElementById('filterMessage').innerText = 'Định dạng ngày không hợp lệ. Vui lòng nhập theo định dạng dd/mm/yyyy.';
+                    return;
+                }
+
+                // Gọi hàm fetchHistoricalData với ngày đã chọn
                 await fetchHistoricalData(startDate, endDate);
             } else {
-                console.log('Ẩn bảng dữ liệu');
                 dataTable.style.display = 'none';
                 toggleButton.innerText = 'Hiển thị danh sách';
             }
@@ -403,7 +405,6 @@
         function convertDateFormat(dateStr) {
             const parts = dateStr.split('/');
             if (parts.length !== 3) {
-                console.error('Định dạng ngày không hợp lệ:', dateStr);
                 return null;
             }
             const day = parts[0].padStart(2, '0');
@@ -446,20 +447,17 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách sử dụng fetch
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
         function sendEmergencyOpenCommand() {
             const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
 
-            fetch(esp32URL)
-                .then(response => response.text())
-                .then(data => {
-                    console.log('Cửa đã được mở khẩn cấp:', data);
-                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
-                })
-                .catch(error => {
-                    console.error('Lỗi khi gửi lệnh mở cửa:', error);
-                    alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
-                });
+            // Mở ESP32 endpoint để kích hoạt mở cửa
+            window.location.href = esp32URL;
+
+            // Sau 1 giây, quay lại dashboard.html
+            setTimeout(function() {
+                window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
+            }, 1000); // 1000 milliseconds = 1 giây
         }
 
         // Khi trang tải
