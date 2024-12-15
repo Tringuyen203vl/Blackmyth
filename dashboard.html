@@ -317,7 +317,6 @@
 
         // Hàm để lấy dữ liệu lịch sử và tạo bảng
         async function fetchHistoricalData(startDate, endDate) {
-            console.log(`Fetching historical data from ${startDate} to ${endDate}`);
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
 
@@ -375,26 +374,16 @@
 
         // Hàm để toggle hiển thị bảng
         async function toggleTable() {
-            console.log('Toggle table button clicked');
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
-                
-                // Lấy giá trị ngày từ input hoặc sử dụng ngày mặc định nếu chưa nhập
+                // Lấy giá trị ngày hiện tại hoặc mặc định
                 const startDateInput = document.getElementById('startDate').value.trim() || '01/01/2023';
                 const endDateInput = document.getElementById('endDate').value.trim() || '31/12/2023';
                 const startDate = convertDateFormat(startDateInput);
                 const endDate = convertDateFormat(endDateInput);
-                
-                if (!startDate || !endDate) {
-                    document.getElementById('filterMessage').style.color = 'red';
-                    document.getElementById('filterMessage').innerText = 'Định dạng ngày không hợp lệ. Vui lòng nhập theo định dạng dd/mm/yyyy.';
-                    return;
-                }
-
-                console.log(`Fetching historical data from ${startDate} to ${endDate}`);
                 await fetchHistoricalData(startDate, endDate);
             } else {
                 dataTable.style.display = 'none';
@@ -416,7 +405,6 @@
 
         // Hàm để lọc dữ liệu theo ngày tháng
         async function filterData() {
-            console.log('Filter data button clicked');
             const startDateInput = document.getElementById('startDate').value.trim();
             const endDateInput = document.getElementById('endDate').value.trim();
             const filterMessage = document.getElementById('filterMessage');
@@ -514,7 +502,6 @@
 </head>
 <body>
     <h1>
-        Dashboard ThingSpeak 1
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
