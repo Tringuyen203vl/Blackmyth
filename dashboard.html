@@ -37,7 +37,7 @@
             width: 100%;
             max-width: 800px;
         }
-aaaaaaâ
+
         /* Nút Đăng Xuất */
         #logoutButton {
             padding: 8px 16px;
@@ -363,15 +363,11 @@ aaaaaaâ
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
 
-            // Nếu startDate và endDate giống nhau, đặt endDateTime là cuối ngày
-            let endDateTime = endDate;
-            if (startDate === endDate) {
-                endDateTime = `${endDate}T23:59:59Z`;
-            } else {
-                endDateTime = `${endDate}T23:59:59Z`;
-            }
+            // Construct start and end datetime in ISO format
+            const startDateTime = `${startDate}T00:00:00Z`;
+            const endDateTime = `${endDate}T23:59:59Z`;
 
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDate}T00:00:00Z&end=${endDateTime}&timezone=UTC`;
+            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDateTime}&end=${endDateTime}&timezone=UTC`;
 
             try {
                 const response = await fetch(url);
@@ -429,22 +425,10 @@ aaaaaaâ
             }
         }
 
-        // Hàm để chuyển đổi định dạng ngày từ dd/mm/yyyy sang yyyy-mm-dd
-        function convertDateFormat(dateStr) {
-            const parts = dateStr.split('/');
-            if (parts.length !== 3) {
-                return null;
-            }
-            const day = parts[0].padStart(2, '0');
-            const month = parts[1].padStart(2, '0');
-            const year = parts[2];
-            return `${year}-${month}-${day}`;
-        }
-
         // Hàm để lọc dữ liệu theo ngày tháng
         async function filterData() {
-            const startDateInput = document.getElementById('startDate').value.trim();
-            const endDateInput = document.getElementById('endDate').value.trim();
+            const startDateInput = document.getElementById('startDate').value;
+            const endDateInput = document.getElementById('endDate').value;
             const filterMessage = document.getElementById('filterMessage');
 
             // Kiểm tra xem cả hai trường đã được nhập đầy đủ chưa
@@ -455,14 +439,8 @@ aaaaaaâ
             }
 
             // Chuyển đổi định dạng ngày
-            const startDate = convertDateFormat(startDateInput);
-            const endDate = convertDateFormat(endDateInput);
-
-            if (!startDate || !endDate) {
-                filterMessage.style.color = 'red';
-                filterMessage.innerText = 'Định dạng ngày không hợp lệ. Vui lòng nhập theo định dạng dd/mm/yyyy.';
-                return;
-            }
+            const startDate = startDateInput; // YYYY-MM-DD
+            const endDate = endDateInput;     // YYYY-MM-DD
 
             // Kiểm tra logic ngày tháng
             if (new Date(startDate) > new Date(endDate)) {
@@ -539,7 +517,7 @@ aaaaaaâ
     </script>
 </head>
 <body>
-    <h1>
+    <h1>hihi
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
@@ -560,9 +538,9 @@ aaaaaaâ
     <!-- Thanh nhập ngày và nút lọc dữ liệu -->
     <div class="filter-container">
         <label for="startDate">Ngày bắt đầu:</label>
-        <input type="text" id="startDate" placeholder="dd/mm/yyyy">
+        <input type="date" id="startDate" placeholder="dd/mm/yyyy">
         <label for="endDate">Ngày kết thúc:</label>
-        <input type="text" id="endDate" placeholder="dd/mm/yyyy">
+        <input type="date" id="endDate" placeholder="dd/mm/yyyy">
         <button id="filterButton">Lọc dữ liệu</button>
         <div id="filterMessage" class="filter-message"></div>
     </div>
