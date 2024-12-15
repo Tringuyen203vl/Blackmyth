@@ -4,7 +4,242 @@
     <meta charset="UTF-8">
     <title>Dashboard Cập Nhật Tự Động</title>
     <style>
-        /* ... (Các phần CSS hiện tại của bạn) ... */
+        /* Reset một số thiết lập mặc định */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif'); /* Thay bằng liên kết hình nền của bạn */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: rgba(244, 246, 248, 0.8); /* Màu nền phụ nếu hình ảnh không tải được */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Chỉnh sửa để không căn giữa hoàn toàn */
+            min-height: 100vh;
+            padding: 20px;
+            position: relative; /* Để chứa thanh thông tin chạy */
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Nút Đăng Xuất */
+        #logoutButton {
+            padding: 8px 16px;
+            font-size: 1em;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #logoutButton:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Nút Mở Cửa Khẩn Cấp */
+        #emergencyOpenButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #f44336; /* Màu đỏ để biểu thị khẩn cấp */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #emergencyOpenButton:hover {
+            background-color: #d32f2f;
+        }
+
+        .data-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .data-item {
+            background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            width: 220px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .data-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        .data-item h2 {
+            font-size: 1.2em;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .data-item p {
+            font-size: 1.5em;
+            color: #555;
+        }
+
+        .live-clock {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        /* Button styling */
+        #toggleButton {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #toggleButton:hover {
+            background-color: #45a049;
+        }
+
+        /* Table styling */
+        #dataTable {
+            display: none; /* Ẩn bảng ban đầu */
+            margin-top: 20px;
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
+        }
+
+        #dataTable th, #dataTable td {
+            border: 1px solid #4CAF50;
+            padding: 12px;
+            text-align: center;
+        }
+
+        #dataTable th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #dataTable tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .data-item {
+                width: 100%;
+            }
+
+            #dataTable {
+                width: 100%;
+            }
+        }
+
+        /* Filter container styling */
+        .filter-container {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .filter-container label {
+            font-size: 1em;
+            color: #333;
+        }
+
+        .filter-container input {
+            padding: 8px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 150px;
+        }
+
+        #filterButton {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #filterButton:hover {
+            background-color: #0b7dda;
+        }
+
+        .filter-message {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1em;
+            color: red;
+        }
+
+        /* Thanh thông tin chạy từ trái sang phải */
+        .running-info {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+            padding: 10px 0;
+        }
+
+        .running-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-left 15s linear infinite;
+            font-size: 1.2em; /* Tăng kích thước chữ ở đây */
+        }
+
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
     </style>
     <script>
         let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
@@ -20,7 +255,7 @@
             let hours = String(date.getHours()).padStart(2, '0');
             let minutes = String(date.getMinutes()).padStart(2, '0');
             let seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+            return ${day}/${month}/${year} ${hours}:${minutes}:${seconds};
         }
 
         // Hàm để chuyển đổi chuỗi 'DD/MM/YYYY' thành đối tượng Date
@@ -67,12 +302,12 @@
         async function fetchData() {
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20`;
+            const url = https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20;
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(HTTP error! Status: ${response.status});
                 }
                 const data = await response.json();
                 const feeds = data.feeds;
@@ -115,12 +350,12 @@
         async function fetchAllData() {
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000`; // Tăng 'results' để lấy nhiều dữ liệu hơn
+            const url = https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000; // Tăng 'results' để lấy nhiều dữ liệu hơn
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(HTTP error! Status: ${response.status});
                 }
                 const data = await response.json();
                 let feeds = data.feeds;
@@ -169,22 +404,21 @@
             const endDate = parseDate(endDateStr);
 
             if (!startDate || !endDate) {
-                document.getElementById('filterMessage').style.color = 'red';
                 document.getElementById('filterMessage').innerText = 'Định dạng ngày không hợp lệ.';
                 document.getElementById('dataTable').style.display = 'none';
                 return;
             }
 
             // Construct start and end datetime in ISO format
-            const startDateTime = `${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}T00:00:00Z`;
-            const endDateTime = `${endDate.getFullYear()}-${String(endDate.getMonth()+1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}T23:59:59Z`;
+            const startDateTime = ${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}T00:00:00Z;
+            const endDateTime = ${endDate.getFullYear()}-${String(endDate.getMonth()+1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}T23:59:59Z;
 
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDateTime}&end=${endDateTime}&timezone=UTC`;
+            const url = https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDateTime}&end=${endDateTime}&timezone=UTC;
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(HTTP error! Status: ${response.status});
                 }
                 const data = await response.json();
                 let feeds = data.feeds;
@@ -291,7 +525,7 @@
                 endDateInput = maxAllowedDate;
                 document.getElementById('endDate').value = formatDate(maxAllowedDate).split(' ')[0]; // Cập nhật lại giá trị trong input (chỉ ngày)
                 filterMessage.style.color = 'orange';
-                filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${formatDate(maxAllowedDate).split(' ')[0]}.`;
+                filterMessage.innerText = Ngày kết thúc đã được giới hạn tại ${formatDate(maxAllowedDate).split(' ')[0]}.;
             } else {
                 filterMessage.style.color = 'green';
                 filterMessage.innerText = '';
@@ -308,14 +542,14 @@
             // Mở ESP32 endpoint để kích hoạt mở cửa
             window.location.href = esp32URL;
 
-            // Sau 1 giây, quay lại dashboard.html nếu cần
+            // Sau 1 giây, quay lại dashboard.html
             setTimeout(function() {
                 window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
             }, 1000); // 1000 milliseconds = 1 giây
         }
 
-        // Hàm để gửi lệnh đăng ký vân tay lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
-        function sendRegisterFingerprintCommand() {
+         // Hàm để gửi lệnh đăng ký vân tay lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
+         function sendRegisterFingerprintCommand() {
             const esp32URL = 'http://192.168.1.8/register_fingerprint'; // Địa chỉ IP của ESP32
 
             // Mở ESP32 endpoint để kích hoạt đăng ký vân tay
@@ -354,7 +588,7 @@
             endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]); // Chỉ đặt phần ngày
 
             setMaxEndDateMessage.style.color = 'green';
-            setMaxEndDateMessage.innerText = `Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate.split(' ')[0]}.`;
+            setMaxEndDateMessage.innerText = Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate.split(' ')[0]}.;
         }
 
         // Hàm kiểm tra trạng thái đăng nhập
@@ -384,7 +618,7 @@
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
                 const seconds = String(now.getSeconds()).padStart(2, '0');
-                liveClockElement.innerText = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+                liveClockElement.innerText = ${day}/${month}/${year} ${hours}:${minutes}:${seconds};
             }
             updateClock(); // Cập nhật ngay lập tức khi tải trang
             setInterval(updateClock, 1000); // Cập nhật mỗi giây
@@ -486,7 +720,7 @@
 </head>
 <body>
     <h1>
-        huhu
+        kkkk
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
@@ -531,7 +765,7 @@
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
 
-    <!-- Nút Đăng Ký Vân Tay -->
+    <!-- Thêm nút Đăng Ký Vân Tay vào phần giao diện -->
     <button id="registerFingerprintButton">Đăng Ký Vân Tay</button>
 
     <!-- Bảng dữ liệu -->
