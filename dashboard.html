@@ -476,27 +476,12 @@
                 });
         }
 
-        // Hàm để gửi lệnh đăng ký vân tay mới lên ESP32 Web Server
+        // Hàm để chuyển hướng tới trang đăng ký vân tay
         function sendEnrollFingerprintCommand() {
             const esp32URL = 'http://192.168.1.8/enroll'; // Thay bằng địa chỉ IP của ESP32 của bạn
 
-            // Gửi yêu cầu tới ESP32 để bắt đầu quá trình đăng ký vân tay
-            fetch(esp32URL)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    console.log(data);
-                    // Chuyển hướng người dùng đến trang đăng ký vân tay
-                    window.location.href = '/enroll';
-                })
-                .catch(error => {
-                    console.error('Lỗi khi gửi yêu cầu đăng ký vân tay:', error);
-                    alert('Đã xảy ra lỗi khi gửi yêu cầu đăng ký vân tay.');
-                });
+            // Chuyển hướng trình duyệt tới trang đăng ký vân tay
+            window.location.href = esp32URL;
         }
 
         // Khi trang tải
@@ -550,48 +535,48 @@
 
         // Hàm để khởi động quá trình tự động cập nhật
         function startAutoUpdate() {
-            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
+            fetchData(); // Lấy dữ liệu ngay tức thì khi trang tải
             setInterval(fetchData, 3000); // Lấy dữ liệu mới mỗi 3 giây
         }
     </script>
 </head>
 <body>
     <h1>
-        <button id="logoutButton">Đăng Xuất</button>
+        <button id="logoutButton">Dang Xuat</button>
     </h1>
     <div class="data-container">
         <div class="data-item">
             <h2>ESP ID</h2>
-            <p id="field1">Đang tải...</p>
+            <p id="field1">Dang tai...</p>
         </div>
         <div class="data-item">
             <h2>Fingerprint ID</h2>
-            <p id="field2">Đang tải...</p>
+            <p id="field2">Dang tai...</p>
         </div>
         <div class="data-item" style="width: 100%; text-align: center;">
-            <h2>Thời gian</h2>
-            <p id="timestamp" class="timestamp">Đang tải...</p>
+            <h2>Thoi gian</h2>
+            <p id="timestamp" class="timestamp">Dang tai...</p>
         </div>
     </div>
 
     <!-- Thanh nhập ngày và nút lọc dữ liệu -->
     <div class="filter-container">
-        <label for="startDate">Ngày bắt đầu:</label>
+        <label for="startDate">Ngay bat dau:</label>
         <input type="text" id="startDate" placeholder="dd/mm/yyyy">
-        <label for="endDate">Ngày kết thúc:</label>
+        <label for="endDate">Ngay ket thuc:</label>
         <input type="text" id="endDate" placeholder="dd/mm/yyyy">
-        <button id="filterButton">Lọc dữ liệu</button>
+        <button id="filterButton">Loc du lieu</button>
         <div id="filterMessage" class="filter-message"></div>
     </div>
 
     <!-- Nút để hiển thị bảng dữ liệu -->
-    <button id="toggleButton">Hiển thị danh sách</button>
+    <button id="toggleButton">Hien thi danh sach</button>
 
     <!-- Nút Mở Cửa Khẩn Cấp -->
-    <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
+    <button id="emergencyOpenButton">Mo Cua Khan Cap</button>
 
     <!-- Nút Đăng Ký Vân Tay Mới -->
-    <button id="enrollFingerprintButton">Đăng Ký Vân Tay Mới</button>
+    <button id="enrollFingerprintButton">Dang Ky Van Tay Moi</button>
 
     <!-- Bảng dữ liệu -->
     <table id="dataTable">
@@ -599,7 +584,7 @@
             <tr>
                 <th>ESP ID</th>
                 <th>Fingerprint ID</th>
-                <th>Thời gian</th>
+                <th>Thoi gian</th>
             </tr>
         </thead>
         <tbody>
@@ -610,7 +595,7 @@
     <!-- Thanh thông tin chạy -->
     <div class="running-info">
         <div class="running-text">
-            📧 Email: your-email@example.com | 📞 Số điện thoại: +84 987 654 321 | 🏠 Địa chỉ: 456 Đường DEF, Quận UVW, Thành phố Hà Nội
+            📧 Email: your-email@example.com | 📞 So dien thoai: +84 987 654 321 | 🏠 Dia chi: 456 Duong DEF, Quan UVW, Thanh pho Ha Noi
         </div>
     </div>
 </body>
