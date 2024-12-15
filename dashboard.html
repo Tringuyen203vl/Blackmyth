@@ -317,6 +317,7 @@
 
         // Hàm để lấy dữ liệu lịch sử và tạo bảng
         async function fetchHistoricalData(startDate, endDate) {
+            console.log(`Fetching historical data from ${startDate} to ${endDate}`);
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
 
@@ -374,6 +375,7 @@
 
         // Hàm để toggle hiển thị bảng
         async function toggleTable() {
+            console.log('Toggle table button clicked');
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
@@ -385,15 +387,14 @@
                 const endDateInput = document.getElementById('endDate').value.trim() || '31/12/2023';
                 const startDate = convertDateFormat(startDateInput);
                 const endDate = convertDateFormat(endDateInput);
-
-                // Kiểm tra định dạng ngày
+                
                 if (!startDate || !endDate) {
                     document.getElementById('filterMessage').style.color = 'red';
                     document.getElementById('filterMessage').innerText = 'Định dạng ngày không hợp lệ. Vui lòng nhập theo định dạng dd/mm/yyyy.';
                     return;
                 }
 
-                // Gọi hàm fetchHistoricalData với ngày đã chọn
+                console.log(`Fetching historical data from ${startDate} to ${endDate}`);
                 await fetchHistoricalData(startDate, endDate);
             } else {
                 dataTable.style.display = 'none';
@@ -415,6 +416,7 @@
 
         // Hàm để lọc dữ liệu theo ngày tháng
         async function filterData() {
+            console.log('Filter data button clicked');
             const startDateInput = document.getElementById('startDate').value.trim();
             const endDateInput = document.getElementById('endDate').value.trim();
             const filterMessage = document.getElementById('filterMessage');
@@ -512,7 +514,7 @@
 </head>
 <body>
     <h1>
-        Dashboard ThingSpeak
+        Dashboard ThingSpeak 1
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
