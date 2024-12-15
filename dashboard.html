@@ -106,10 +106,10 @@
             color: #555;
         }
 
-        .timestamp {
-            font-size: 0.9em;
-            color: #888;
+        .live-clock {
             margin-top: 10px;
+            font-size: 1.2em;
+            color: #333;
         }
 
         /* Button styling */
@@ -240,13 +240,6 @@
                 transform: translateX(-100%);
             }
         }
-
-        /* Đồng hồ trực tiếp */
-        .live-clock {
-            margin-top: 10px;
-            font-size: 1.2em;
-            color: #333;
-        }
     </style>
     <script>
         let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
@@ -328,7 +321,8 @@
                 // Cập nhật dữ liệu lên trang web
                 document.getElementById('field1').innerText = latestFeed.field1 || 'Không có dữ liệu';
                 document.getElementById('field2').innerText = latestFeed.field2 || 'Không có dữ liệu';
-                document.getElementById('timestamp').innerText = latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu';
+                // Xóa dòng cập nhật 'timestamp'
+                // document.getElementById('timestamp').innerText = latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu';
 
                 // Cập nhật dữ liệu trong bảng nếu bảng đang hiển thị
                 if (document.getElementById('dataTable').style.display === 'table') {
@@ -346,7 +340,7 @@
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('field1').innerText = 'Lỗi';
                 document.getElementById('field2').innerText = 'Lỗi';
-                document.getElementById('timestamp').innerText = 'Lỗi';
+                // document.getElementById('timestamp').innerText = 'Lỗi';
             }
         }
 
@@ -672,8 +666,9 @@
         </div>
         <div class="data-item" style="width: 100%; text-align: center;">
             <h2>Thời gian</h2>
-            <p id="timestamp" class="timestamp">Đang tải...</p>
-            <!-- Đồng hồ trực tiếp -->
+            <!-- Xóa phần timestamp không cập nhật -->
+            <!-- <p id="timestamp" class="timestamp">Đang tải...</p> -->
+            <!-- Giữ lại đồng hồ trực tiếp -->
             <p id="liveClock" class="live-clock"></p>
         </div>
     </div>
