@@ -439,7 +439,7 @@
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
         function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
+            const esp32URL = 'http://192.168.1.8/emergency_open'; // Địa chỉ IP của ESP32
 
             // Mở ESP32 endpoint để kích hoạt mở cửa
             window.location.href = esp32URL;
