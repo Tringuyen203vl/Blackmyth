@@ -375,7 +375,7 @@
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const data = await response.json();
-                const feeds = data.feeds;
+                let feeds = data.feeds;
 
                 if (feeds.length === 0) {
                     // Hiển thị thông báo không có dữ liệu
@@ -385,6 +385,22 @@
                     return;
                 } else {
                     document.getElementById('filterMessage').innerText = '';
+                }
+
+                // Lọc dữ liệu không vượt quá 14/12/2024
+                const maxAllowedDate = new Date('2024-12-14T23:59:59Z');
+                feeds = feeds.filter(feed => {
+                    if (feed.created_at) {
+                        const feedDate = new Date(feed.created_at);
+                        return feedDate <= maxAllowedDate;
+                    }
+                    return false;
+                });
+
+                if (feeds.length === 0) {
+                    document.getElementById('filterMessage').innerText = 'Không có dữ liệu sau khi lọc.';
+                    document.getElementById('dataTable').style.display = 'none';
+                    return;
                 }
 
                 // Xóa dữ liệu cũ trong bảng
@@ -428,8 +444,18 @@
         // Hàm để lọc dữ liệu theo ngày tháng
         async function filterData() {
             const startDateInput = document.getElementById('startDate').value;
-            const endDateInput = document.getElementById('endDate').value;
+            let endDateInput = document.getElementById('endDate').value;
             const filterMessage = document.getElementById('filterMessage');
+
+            // Giới hạn ngày kết thúc không được vượt quá 14/12/2024
+            const maxEndDate = '2024-12-14';
+
+            if (endDateInput > maxEndDate) {
+                endDateInput = maxEndDate;
+                document.getElementById('endDate').value = maxEndDate; // Cập nhật lại giá trị trong input
+                filterMessage.style.color = 'orange';
+                filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${maxEndDate}.`;
+            }
 
             // Kiểm tra xem cả hai trường đã được nhập đầy đủ chưa
             if (startDateInput === '' || endDateInput === '') {
@@ -517,7 +543,7 @@
     </script>
 </head>
 <body>
-    <h1>hihi
+    <h1>
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
@@ -540,7 +566,7 @@
         <label for="startDate">Ngày bắt đầu:</label>
         <input type="date" id="startDate" placeholder="dd/mm/yyyy">
         <label for="endDate">Ngày kết thúc:</label>
-        <input type="date" id="endDate" placeholder="dd/mm/yyyy">
+        <input type="date" id="endDate" placeholder="dd/mm/yyyy" max="2024-12-14">
         <button id="filterButton">Lọc dữ liệu</button>
         <div id="filterMessage" class="filter-message"></div>
     </div>
