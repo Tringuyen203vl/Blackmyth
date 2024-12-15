@@ -71,6 +71,23 @@
             background-color: #d32f2f;
         }
 
+        /* Nút Đăng Ký Vân Tay Mới */
+        #enrollFingerprintButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #2196F3; /* Màu xanh dương */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #enrollFingerprintButton:hover {
+            background-color: #0b7dda;
+        }
+
         .data-container {
             display: flex;
             flex-wrap: wrap;
@@ -450,6 +467,23 @@
             }, 1000); // 1000 milliseconds = 1 giây
         }
 
+        // Hàm để gửi lệnh đăng ký vân tay mới lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
+        function sendEnrollFingerprintCommand() {
+            const esp32URL = 'http://192.168.1.10/enroll'; // Thay bằng địa chỉ IP của ESP32 của bạn
+
+            // Gửi yêu cầu tới ESP32 để bắt đầu quá trình đăng ký vân tay
+            fetch(esp32URL)
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                    alert('Đang bắt đầu quá trình đăng ký vân tay mới. Vui lòng xem trên ESP32.');
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu đăng ký vân tay:', error);
+                    alert('Đã xảy ra lỗi khi gửi yêu cầu đăng ký vân tay.');
+                });
+        }
+
         // Khi trang tải
         window.addEventListener('load', function() {
             // Kiểm tra đăng nhập
@@ -480,6 +514,12 @@
             const emergencyBtn = document.getElementById('emergencyOpenButton');
             if (emergencyBtn) {
                 emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
+            }
+
+            // Thêm sự kiện cho nút "Đăng Ký Vân Tay Mới"
+            const enrollBtn = document.getElementById('enrollFingerprintButton');
+            if (enrollBtn) {
+                enrollBtn.addEventListener('click', sendEnrollFingerprintCommand);
             }
         });
 
@@ -534,6 +574,9 @@
 
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
+
+    <!-- Nút Đăng Ký Vân Tay Mới -->
+    <button id="enrollFingerprintButton">Đăng Ký Vân Tay Mới</button>
 
     <!-- Bảng dữ liệu -->
     <table id="dataTable">
