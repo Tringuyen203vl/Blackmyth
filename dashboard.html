@@ -559,13 +559,15 @@
         // Hàm để gửi yêu cầu đăng ký vân tay
         function sendRegisterFingerprintCommand() {
             const esp32URL = 'http://192.168.1.8/register_fingerprint';
-               // Mở ESP32 endpoint để kích hoạt mở cửa
+            // Mở ESP32 endpoint để kích hoạt đăng ký vân tay
             window.location.href = esp32URL;
 
-            // Sau 1 giây, quay lại dashboard.html
+            // **Xóa đoạn setTimeout này để không tự động quay lại dashboard**
+            /*
             setTimeout(function() {
                 window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
             }, 1000); // 1000 milliseconds = 1 giây
+            */
         }
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
@@ -577,7 +579,7 @@
 
             // Sau 1 giây, quay lại dashboard.html
             setTimeout(function() {
-                window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
+                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/'; // Thay bằng URL chính xác của dashboard nếu khác
             }, 1000); // 1000 milliseconds = 1 giây
         }
 
@@ -740,7 +742,7 @@
 </head>
 <body>
     <h1>
-        klp2ff4
+        kty
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
