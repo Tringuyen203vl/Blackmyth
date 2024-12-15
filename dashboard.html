@@ -247,14 +247,17 @@
         // Biến để xác định ngày kết thúc tối đa
         // Bạn có thể thay đổi giá trị này tùy ý hoặc thiết lập nó dựa trên một điều kiện nào đó
         // Ví dụ: thiết lập ngày kết thúc tối đa là hôm nay
-        let maxEndDate = formatDate(new Date()); // 'DD/MM/YYYY'
+        let maxEndDate = formatDate(new Date()); // 'DD/MM/YYYY HH:MM:SS'
 
-        // Hàm để định dạng đối tượng Date thành chuỗi 'DD/MM/YYYY'
+        // Hàm để định dạng đối tượng Date thành chuỗi 'DD/MM/YYYY HH:MM:SS'
         function formatDate(date) {
             let day = String(date.getDate()).padStart(2, '0');
             let month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
             let year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+            let hours = String(date.getHours()).padStart(2, '0');
+            let minutes = String(date.getMinutes()).padStart(2, '0');
+            let seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
         }
 
         // Hàm để chuyển đổi chuỗi 'DD/MM/YYYY' thành đối tượng Date
@@ -450,7 +453,7 @@
                     const createdAtDate = feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu';
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
-                        feed.field2 || 'Không có dữ liệu',
+                        feed.field2 || 'Không có dữữ liệu',
                         createdAtDate
                     );
                     lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
@@ -558,11 +561,11 @@
             }
 
             // Cập nhật biến maxEndDate
-            maxEndDate = maxEndDateInput;
+            maxEndDate = formatDate(parsedMaxEndDate); // Bao gồm cả giờ, phút, giây
 
             // Cập nhật thuộc tính max cho input endDate
             const endDateInputElement = document.getElementById('endDate');
-            endDateInputElement.setAttribute('max', maxEndDate);
+            endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]); // Chỉ đặt phần ngày
 
             setMaxEndDateMessage.style.color = 'green';
             setMaxEndDateMessage.innerText = `Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate}.`;
@@ -572,7 +575,7 @@
         window.addEventListener('load', function() {
             // Thiết lập ngày kết thúc tối đa cho input endDate
             const endDateInputElement = document.getElementById('endDate');
-            endDateInputElement.setAttribute('max', maxEndDate);
+            endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]); // Chỉ đặt phần ngày
 
             // Kiểm tra đăng nhập
             checkLoginStatus();
@@ -628,7 +631,7 @@
         }
     </script>
 </head>
-<body>
+<body>hihi
     <h1>
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
