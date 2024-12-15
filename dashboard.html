@@ -2,9 +2,9 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Cap Nhat Tu Dong</title>
+    <title>Dashboard Cập Nhật Tự Động</title>
     <style>
-        /* Reset cac thiet lap mac dinh */
+        /* Reset các thiết lập mặc định */
         * {
             margin: 0;
             padding: 0;
@@ -13,18 +13,18 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background-image: url('https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif'); /* Thay bang lien ket hinh nen cua ban */
+            background-image: url('https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif'); /* Thay bằng liên kết hình nền của bạn */
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-color: rgba(244, 246, 248, 0.8); /* Mau nen phu neu hinh anh khong tai duoc */
+            background-color: rgba(244, 246, 248, 0.8); /* Màu nền phụ nếu hình ảnh không tải được */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Chinh sua de khong can giua hoan toan */
+            justify-content: flex-start; /* Chỉnh sửa để không cần giữa hoàn toàn */
             min-height: 100vh;
             padding: 20px;
-            position: relative; /* De chua thanh thong tin chay */
+            position: relative; /* Để chứa thanh thông tin chạy */
         }
 
         h1 {
@@ -38,7 +38,7 @@
             max-width: 800px;
         }
 
-        /* Nut Dang Xuat */
+        /* Nút Đăng Xuất */
         #logoutButton {
             padding: 8px 16px;
             font-size: 1em;
@@ -54,12 +54,12 @@
             background-color: #d32f2f;
         }
 
-        /* Nut Mo Cua Khan Cap */
+        /* Nút Mở Cửa Khẩn Cấp */
         #emergencyOpenButton {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
-            background-color: #f44336; /* Mau do de bieu thi khan cap */
+            background-color: #f44336; /* Màu đỏ để biểu thị khẩn cấp */
             color: white;
             border: none;
             border-radius: 5px;
@@ -71,12 +71,12 @@
             background-color: #d32f2f;
         }
 
-        /* Nut Dang Ky Van Tay Moi */
+        /* Nút Đăng Ký Vân Tay Mới */
         #enrollFingerprintButton {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
-            background-color: #2196F3; /* Mau xanh duong */
+            background-color: #2196F3; /* Màu xanh dương */
             color: white;
             border: none;
             border-radius: 5px;
@@ -98,7 +98,7 @@
         }
 
         .data-item {
-            background-color: rgba(255, 255, 255, 0.9); /* Do trong suot de nhin thay hinh nen */
+            background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
             border: 2px solid #4CAF50;
             border-radius: 10px;
             padding: 20px;
@@ -148,13 +148,13 @@
 
         /* Table styling */
         #dataTable {
-            display: none; /* An bang ban dau */
+            display: none; /* Ẩn bảng ban đầu */
             margin-top: 20px;
             width: 100%;
             max-width: 800px;
             border-collapse: collapse;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            background-color: rgba(255, 255, 255, 0.9); /* Do trong suot de nhin thay hinh nen */
+            background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
         }
 
         #dataTable th, #dataTable td {
@@ -229,7 +229,7 @@
             color: red;
         }
 
-        /* Thanh thong tin chay tu trai sang phai */
+        /* Thanh thông tin chạy từ trái sang phải */
         .running-info {
             position: fixed;
             bottom: 0;
@@ -246,7 +246,7 @@
             display: inline-block;
             padding-left: 100%;
             animation: scroll-left 15s linear infinite;
-            font-size: 1.2em; /* Tang kich thuoc chu o day */
+            font-size: 1.2em; /* Tăng kích thước chữ ở đây */
         }
 
         @keyframes scroll-left {
@@ -259,20 +259,20 @@
         }
     </style>
     <script>
-        let lastEntryID = null; // Bien de theo doi entry ID cuoi cung da duoc them vao bang
+        let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
 
-        // Ham de dang xuat nguoi dung
+        // Hàm để đăng xuất người dùng
         function logout() {
-            // Xoa trang thai dang nhap khoi sessionStorage
+            // Xóa trạng thái đăng nhập khỏi sessionStorage
             sessionStorage.removeItem('isLoggedIn');
-            // Hoac ban co the xoa toan bo sessionStorage neu khong can giu du lieu khac
+            // Hoặc bạn có thể xóa toàn bộ sessionStorage nếu không cần giữ dữ liệu khác
             // sessionStorage.clear();
             
-            // Chuyen huong nguoi dung ve trang dang nhap
+            // Chuyển hướng người dùng về trang đăng nhập
             window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
         }
 
-        // Ham de tao hang moi trong bang
+        // Hàm để tạo hàng mới trong bảng
         function addRowToTable(field1, field2, timestamp) {
             const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
             const newRow = table.insertRow();
@@ -286,10 +286,10 @@
             cell3.innerText = timestamp;
         }
 
-        // Ham de lay du lieu tu ThingSpeak
+        // Hàm để lấy dữ liệu từ ThingSpeak
         async function fetchData() {
-            const channelID = '2783657'; // Thay bang Channel ID cua ban
-            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bang API Read Key cua ban
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
             const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20`;
 
             try {
@@ -301,43 +301,43 @@
                 const feeds = data.feeds;
 
                 if (feeds.length === 0) {
-                    console.warn('Khong co du lieu tu ThingSpeak.');
+                    console.warn('Không có dữ liệu từ ThingSpeak.');
                     return;
                 }
 
                 const latestFeed = feeds[feeds.length - 1];
 
-                // Cap nhat du lieu len trang web
-                document.getElementById('field1').innerText = latestFeed.field1 || 'Khong co du lieu';
-                document.getElementById('field2').innerText = latestFeed.field2 || 'Khong co du lieu';
-                document.getElementById('timestamp').innerText = latestFeed.created_at ? new Date(latestFeed.created_at).toLocaleString() : 'Khong co du lieu';
+                // Cập nhật dữ liệu lên trang web
+                document.getElementById('field1').innerText = latestFeed.field1 || 'Không có dữ liệu';
+                document.getElementById('field2').innerText = latestFeed.field2 || 'Không có dữ liệu';
+                document.getElementById('timestamp').innerText = latestFeed.created_at ? new Date(latestFeed.created_at).toLocaleString() : 'Không có dữ liệu';
 
-                // Cap nhat du lieu trong bang neu bang dang hien thi
+                // Cập nhật dữ liệu trong bảng nếu bảng đang hiển thị
                 if (document.getElementById('dataTable').style.display === 'table') {
-                    // Kiem tra xem entry da ton tai chua
+                    // Kiểm tra xem entry đã tồn tại chưa
                     if (latestFeed.entry_id !== lastEntryID) {
                         addRowToTable(
-                            latestFeed.field1 || 'Khong co du lieu',
-                            latestFeed.field2 || 'Khong co du lieu',
-                            latestFeed.created_at ? new Date(latestFeed.created_at).toLocaleString() : 'Khong co du lieu'
+                            latestFeed.field1 || 'Không có dữ liệu',
+                            latestFeed.field2 || 'Không có dữ liệu',
+                            latestFeed.created_at ? new Date(latestFeed.created_at).toLocaleString() : 'Không có dữ liệu'
                         );
                         lastEntryID = latestFeed.entry_id;
                     }
                 }
             } catch (error) {
-                console.error('Loi khi lay du lieu:', error);
-                document.getElementById('field1').innerText = 'Loi';
-                document.getElementById('field2').innerText = 'Loi';
-                document.getElementById('timestamp').innerText = 'Loi';
+                console.error('Lỗi khi lấy dữ liệu:', error);
+                document.getElementById('field1').innerText = 'Lỗi';
+                document.getElementById('field2').innerText = 'Lỗi';
+                document.getElementById('timestamp').innerText = 'Lỗi';
             }
         }
 
-        // Ham de lay du lieu lich su va tao bang
+        // Hàm để lấy dữ liệu lịch sử và tạo bảng
         async function fetchHistoricalData(startDate, endDate) {
-            const channelID = '2783657'; // Thay bang Channel ID cua ban
-            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bang API Read Key cua ban
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
 
-            // Neu startDate va endDate giong nhau, dat endDateTime la cuoi ngay
+            // Nếu startDate và endDate giống nhau, đặt endDateTime là cuối ngày
             let endDateTime = endDate;
             if (startDate === endDate) {
                 endDateTime = `${endDate}T23:59:59Z`;
@@ -356,47 +356,47 @@
                 const feeds = data.feeds;
 
                 if (feeds.length === 0) {
-                    // Hien thi thong bao khong co du lieu
-                    document.getElementById('filterMessage').innerText = 'Du lieu khong ton tai.';
-                    // An bang neu dang hien thi
+                    // Hiển thị thông báo không có dữ liệu
+                    document.getElementById('filterMessage').innerText = 'Dữ liệu không tồn tại.';
+                    // Ẩn bảng nếu đang hiển thị
                     document.getElementById('dataTable').style.display = 'none';
                     return;
                 } else {
                     document.getElementById('filterMessage').innerText = '';
                 }
 
-                // Xoa du lieu cu trong bang
+                // Xóa dữ liệu cũ trong bảng
                 const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
                 tableBody.innerHTML = '';
 
-                // Them cac dong vao bang
+                // Thêm các dòng vào bảng
                 feeds.forEach(feed => {
                     addRowToTable(
-                        feed.field1 || 'Khong co du lieu',
-                        feed.field2 || 'Khong co du lieu',
-                        feed.created_at ? new Date(feed.created_at).toLocaleString() : 'Khong co du lieu'
+                        feed.field1 || 'Không có dữ liệu',
+                        feed.field2 || 'Không có dữ liệu',
+                        feed.created_at ? new Date(feed.created_at).toLocaleString() : 'Không có dữ liệu'
                     );
-                    lastEntryID = feed.entry_id; // Cap nhat entry ID cuoi cung
+                    lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
                 });
 
-                // Hien thi bang du lieu
+                // Hiển thị bảng dữ liệu
                 document.getElementById('dataTable').style.display = 'table';
             } catch (error) {
-                console.error('Loi khi lay du lieu lich su:', error);
-                document.getElementById('filterMessage').innerText = 'Co loi xay ra khi loc du lieu.';
-                // An bang neu co loi
+                console.error('Lỗi khi lấy dữ liệu lịch sử:', error);
+                document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi lọc dữ liệu.';
+                // Ẩn bảng nếu có lỗi
                 document.getElementById('dataTable').style.display = 'none';
             }
         }
 
-        // Ham de toggle hien thi bang
+        // Hàm để toggle hiển thị bảng
         async function toggleTable() {
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
                 dataTable.style.display = 'table';
-                toggleButton.innerText = 'An bang du lieu';
-                // Lay gia tri ngay hien tai hoac mac dinh
+                toggleButton.innerText = 'Ẩn bảng dữ liệu';
+                // Lấy giá trị ngày hiện tại hoặc mặc định
                 const startDateInput = document.getElementById('startDate').value.trim() || '01/01/2023';
                 const endDateInput = document.getElementById('endDate').value.trim() || '31/12/2023';
                 const startDate = convertDateFormat(startDateInput);
@@ -404,11 +404,11 @@
                 await fetchHistoricalData(startDate, endDate);
             } else {
                 dataTable.style.display = 'none';
-                toggleButton.innerText = 'Hien thi danh sach';
+                toggleButton.innerText = 'Hiển thị danh sách';
             }
         }
 
-        // Ham de chuyen doi dinh dang ngay tu dd/mm/yyyy sang yyyy-mm-dd
+        // Hàm để chuyển đổi định dạng ngày từ dd/mm/yyyy sang yyyy-mm-dd
         function convertDateFormat(dateStr) {
             const parts = dateStr.split('/');
             if (parts.length !== 3) {
@@ -420,43 +420,43 @@
             return `${year}-${month}-${day}`;
         }
 
-        // Ham de loc du lieu theo ngay thang
+        // Hàm để lọc dữ liệu theo ngày tháng
         async function filterData() {
             const startDateInput = document.getElementById('startDate').value.trim();
             const endDateInput = document.getElementById('endDate').value.trim();
             const filterMessage = document.getElementById('filterMessage');
 
-            // Kiem tra xem ca hai truong da duoc nhap day du chua
+            // Kiểm tra xem cả hai trường đã được nhập đầy đủ chưa
             if (startDateInput === '' || endDateInput === '') {
                 filterMessage.style.color = 'red';
-                filterMessage.innerText = 'Vui long nhap day du ngay bat dau va ket thuc.';
+                filterMessage.innerText = 'Vui lòng nhập đầy đủ ngày bắt đầu và kết thúc.';
                 return;
             }
 
-            // Chuyen doi dinh dang ngay
+            // Chuyển đổi định dạng ngày
             const startDate = convertDateFormat(startDateInput);
             const endDate = convertDateFormat(endDateInput);
 
             if (!startDate || !endDate) {
                 filterMessage.style.color = 'red';
-                filterMessage.innerText = 'Dinh dang ngay khong hop le. Vui long nhap theo dinh dang dd/mm/yyyy.';
+                filterMessage.innerText = 'Định dạng ngày không hợp lệ. Vui lòng nhập theo định dạng dd/mm/yyyy.';
                 return;
             }
 
-            // Kiem tra logic ngay thang
+            // Kiểm tra logic ngày tháng
             if (new Date(startDate) > new Date(endDate)) {
                 filterMessage.style.color = 'red';
-                filterMessage.innerText = 'Ngay bat dau khong duoc lon hon ngay ket thuc.';
+                filterMessage.innerText = 'Ngày bắt đầu không được lớn hơn ngày kết thúc.';
                 return;
             }
 
-            // Goi ham fetchHistoricalData voi ngay da chon
+            // Gọi hàm fetchHistoricalData với ngày đã chọn
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Ham de gui lenh mo cua khan cap len ESP32 Web Server bang cach fetch
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách fetch
         function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.8/emergency_open'; // Thay bang dia chi IP cua ESP32 cua ban
+            const esp32URL = 'http://192.168.1.8/emergency_open'; // Thay bằng địa chỉ IP của ESP32 của bạn
 
             // Gửi yêu cầu tới ESP32 để kích hoạt mở cửa khẩn cấp
             fetch(esp32URL)
@@ -471,14 +471,14 @@
                     alert('Cửa đã được mở khẩn cấp.');
                 })
                 .catch(error => {
-                    console.error('Loi khi gui lenh mo cua khan cap:', error);
-                    alert('Da xay ra loi khi gui lenh mo cua khan cap.');
+                    console.error('Lỗi khi gửi lệnh mở cửa khẩn cấp:', error);
+                    alert('Đã xảy ra lỗi khi gửi lệnh mở cửa khẩn cấp.');
                 });
         }
 
-        // Ham de gui lenh dang ky van tay moi len ESP32 Web Server
+        // Hàm để gửi lệnh đăng ký vân tay mới lên ESP32 Web Server
         function sendEnrollFingerprintCommand() {
-            const esp32URL = 'http://192.168.1.8/enroll'; // Thay bang dia chi IP cua ESP32 cua ban
+            const esp32URL = 'http://192.168.1.8/enroll'; // Thay bằng địa chỉ IP của ESP32 của bạn
 
             // Gửi yêu cầu tới ESP32 để bắt đầu quá trình đăng ký vân tay
             fetch(esp32URL)
@@ -490,126 +490,127 @@
                 })
                 .then(data => {
                     console.log(data);
-                    alert('Dang ky van tay moi bat dau. Vui long doi tren ESP32.');
+                    // Chuyển hướng người dùng đến trang đăng ký vân tay
+                    window.location.href = '/enroll';
                 })
                 .catch(error => {
-                    console.error('Loi khi gui yeu cau dang ky van tay:', error);
-                    alert('Da xay ra loi khi gui yeu cau dang ky van tay.');
+                    console.error('Lỗi khi gửi yêu cầu đăng ký vân tay:', error);
+                    alert('Đã xảy ra lỗi khi gửi yêu cầu đăng ký vân tay.');
                 });
         }
 
-        // Khi trang tai
+        // Khi trang tải
         window.addEventListener('load', function() {
-            // Kiem tra dang nhap
+            // Kiểm tra đăng nhập
             checkLoginStatus();
 
-            // Khoi dong tu dong cap nhat
+            // Khởi động tự động cập nhật
             startAutoUpdate();
 
-            // Them su kien cho nut "Dang Xuat"
+            // Thêm sự kiện cho nút "Đăng Xuất"
             const logoutBtn = document.getElementById('logoutButton');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', logout);
             }
 
-            // Them su kien cho nut "Hien thi danh sach"
+            // Thêm sự kiện cho nút "Hiển thị danh sách"
             const toggleBtn = document.getElementById('toggleButton');
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', toggleTable);
             }
 
-            // Them su kien cho nut "Loc du lieu"
+            // Thêm sự kiện cho nút "Lọc dữ liệu"
             const filterBtn = document.getElementById('filterButton');
             if (filterBtn) {
                 filterBtn.addEventListener('click', filterData);
             }
 
-            // Them su kien cho nut "Mo Cua Khan Cap"
+            // Thêm sự kiện cho nút "Mở Cửa Khẩn Cấp"
             const emergencyBtn = document.getElementById('emergencyOpenButton');
             if (emergencyBtn) {
                 emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
             }
 
-            // Them su kien cho nut "Dang Ky Van Tay Moi"
+            // Thêm sự kiện cho nút "Đăng Ký Vân Tay Mới"
             const enrollBtn = document.getElementById('enrollFingerprintButton');
             if (enrollBtn) {
                 enrollBtn.addEventListener('click', sendEnrollFingerprintCommand);
             }
         });
 
-        // Ham kiem tra trang thai dang nhap
+        // Hàm kiểm tra trạng thái đăng nhập
         function checkLoginStatus() {
-            // Kiem tra xem nguoi dung da dang nhap hay chua
+            // Kiểm tra xem người dùng đã đăng nhập hay chưa
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             if (isLoggedIn !== 'true') {
-                // Neu chua dang nhap, chuyen huong ve trang dang nhap
+                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
                 window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
             }
         }
 
-        // Ham de khoi dong qua trinh tu dong cap nhat
+        // Hàm để khởi động quá trình tự động cập nhật
         function startAutoUpdate() {
-            fetchData(); // Lay du lieu ngay lap tuc khi trang tai
-            setInterval(fetchData, 3000); // Lay du lieu moi 3 giay
+            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
+            setInterval(fetchData, 3000); // Lấy dữ liệu mới mỗi 3 giây
         }
     </script>
 </head>
 <body>
     <h1>
-        <button id="logoutButton">Dang Xuat</button>
+        <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
         <div class="data-item">
             <h2>ESP ID</h2>
-            <p id="field1">Dang tai...</p>
+            <p id="field1">Đang tải...</p>
         </div>
         <div class="data-item">
             <h2>Fingerprint ID</h2>
-            <p id="field2">Dang tai...</p>
+            <p id="field2">Đang tải...</p>
         </div>
         <div class="data-item" style="width: 100%; text-align: center;">
-            <h2>Thoi gian</h2>
-            <p id="timestamp" class="timestamp">Dang tai...</p>
+            <h2>Thời gian</h2>
+            <p id="timestamp" class="timestamp">Đang tải...</p>
         </div>
     </div>
 
-    <!-- Thanh nhap ngay va nut loc du lieu -->
+    <!-- Thanh nhập ngày và nút lọc dữ liệu -->
     <div class="filter-container">
-        <label for="startDate">Ngay bat dau:</label>
+        <label for="startDate">Ngày bắt đầu:</label>
         <input type="text" id="startDate" placeholder="dd/mm/yyyy">
-        <label for="endDate">Ngay ket thuc:</label>
+        <label for="endDate">Ngày kết thúc:</label>
         <input type="text" id="endDate" placeholder="dd/mm/yyyy">
-        <button id="filterButton">Loc du lieu</button>
+        <button id="filterButton">Lọc dữ liệu</button>
         <div id="filterMessage" class="filter-message"></div>
     </div>
 
-    <!-- Nut de hien thi bang du lieu -->
-    <button id="toggleButton">Hien thi danh sach</button>
+    <!-- Nút để hiển thị bảng dữ liệu -->
+    <button id="toggleButton">Hiển thị danh sách</button>
 
-    <!-- Nut Mo Cua Khan Cap -->
-    <button id="emergencyOpenButton">Mo Cua Khan Cap</button>
+    <!-- Nút Mở Cửa Khẩn Cấp -->
+    <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
 
-    <!-- Nut Dang Ky Van Tay Moi -->
-    <button id="enrollFingerprintButton">Dang Ky Van Tay Moi</button>
+    <!-- Nút Đăng Ký Vân Tay Mới -->
+    <button id="enrollFingerprintButton">Đăng Ký Vân Tay Mới</button>
 
-    <!-- Bang du lieu -->
+    <!-- Bảng dữ liệu -->
     <table id="dataTable">
         <thead>
             <tr>
                 <th>ESP ID</th>
                 <th>Fingerprint ID</th>
-                <th>Thoi gian</th>
+                <th>Thời gian</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Du lieu se duoc them vao day -->
+            <!-- Dữ liệu sẽ được thêm vào đây -->
         </tbody>
     </table>
 
-    <!-- Thanh thong tin chay -->
+    <!-- Thanh thông tin chạy -->
     <div class="running-info">
         <div class="running-text">
-            📧 Email: your-email@example.com | 📞 So dien thoai: +84 987 654 321 | 🏠 Dia chi: 456 Duong DEF, Quan UVW, Thanh pho Ha Noi
+            📧 Email: your-email@example.com | 📞 Số điện thoại: +84 987 654 321 | 🏠 Địa chỉ: 456 Đường DEF, Quận UVW, Thành phố Hà Nội
         </div>
     </div>
 </body>
