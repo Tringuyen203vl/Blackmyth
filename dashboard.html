@@ -71,6 +71,23 @@
             background-color: #d32f2f;
         }
 
+        /* Nút Đăng Ký Vân Tay */
+        #registerFingerprintButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #2196F3; /* Màu xanh để phân biệt */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #registerFingerprintButton:hover {
+            background-color: #0b7dda;
+        }
+
         .data-container {
             display: flex;
             flex-wrap: wrap;
@@ -404,6 +421,7 @@
             const endDate = parseDate(endDateStr);
 
             if (!startDate || !endDate) {
+                document.getElementById('filterMessage').style.color = 'red';
                 document.getElementById('filterMessage').innerText = 'Định dạng ngày không hợp lệ.';
                 document.getElementById('dataTable').style.display = 'none';
                 return;
@@ -425,6 +443,7 @@
 
                 if (feeds.length === 0) {
                     // Hiển thị thông báo không có dữ liệu
+                    document.getElementById('filterMessage').style.color = 'red';
                     document.getElementById('filterMessage').innerText = 'Dữ liệu không tồn tại.';
                     // Ẩn bảng nếu đang hiển thị
                     document.getElementById('dataTable').style.display = 'none';
@@ -445,6 +464,7 @@
                 });
 
                 if (feeds.length === 0) {
+                    document.getElementById('filterMessage').style.color = 'red';
                     document.getElementById('filterMessage').innerText = 'Không có dữ liệu sau khi lọc.';
                     document.getElementById('dataTable').style.display = 'none';
                     return;
@@ -535,17 +555,37 @@
             await fetchHistoricalData(startDateInput, endDateInput);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách gửi yêu cầu AJAX
         function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.8/emergency_open'; // Địa chỉ IP của ESP32
+            const esp32URL = 'http://192.168.1.8/emergency_open'; // Thay bằng địa chỉ IP của ESP32 của bạn
 
-            // Mở ESP32 endpoint để kích hoạt mở cửa
-            window.location.href = esp32URL;
+            // Gửi yêu cầu GET để kích hoạt mở cửa khẩn cấp
+            fetch(esp32URL, { method: 'GET' })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Phản hồi từ ESP32:', data);
+                    alert('Đã gửi lệnh mở cửa khẩn cấp.');
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    alert('Không thể kết nối với ESP32.');
+                });
+        }
 
-            // Sau 1 giây, quay lại dashboard.html
-            setTimeout(function() {
-                window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
-            }, 1000); // 1000 milliseconds = 1 giây
+        // Hàm để gửi lệnh đăng ký vân tay lên ESP32 Web Server bằng cách gửi yêu cầu AJAX
+        function sendRegisterFingerprintCommand() {
+            const esp32URL = 'http://192.168.1.8/register_fingerprint'; // Thay bằng địa chỉ IP của ESP32 của bạn
+
+            fetch(esp32URL, { method: 'GET' })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Phản hồi từ ESP32:', data);
+                    alert('Đang bắt đầu đăng ký vân tay. Vui lòng theo dõi thiết bị.');
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                    alert('Không thể kết nối với ESP32.');
+                });
         }
 
         // Hàm để thiết lập maxEndDate từ input của người dùng
@@ -696,12 +736,18 @@
             if (setMaxEndDateBtn) {
                 setMaxEndDateBtn.addEventListener('click', setMaxEndDate);
             }
+
+            // Thêm sự kiện cho nút "Đăng Ký Vân Tay"
+            const registerFingerprintBtn = document.getElementById('registerFingerprintButton');
+            if (registerFingerprintBtn) {
+                registerFingerprintBtn.addEventListener('click', sendRegisterFingerprintCommand);
+            }
         });
     </script>
 </head>
 <body>
     <h1>
-        kkkk
+        Dashboard
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
@@ -715,8 +761,6 @@
         </div>
         <div class="data-item" style="width: 100%; text-align: center;">
             <h2>Thời gian</h2>
-            <!-- Xóa phần timestamp không cập nhật -->
-            <!-- <p id="timestamp" class="timestamp">Đang tải...</p> -->
             <!-- Giữ lại đồng hồ trực tiếp -->
             <p id="liveClock" class="live-clock"></p>
         </div>
@@ -745,6 +789,9 @@
 
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
+
+    <!-- Nút Đăng Ký Vân Tay -->
+    <button id="registerFingerprintButton">Đăng Ký Vân Tay</button>
 
     <!-- Bảng dữ liệu -->
     <table id="dataTable">
