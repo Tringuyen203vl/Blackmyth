@@ -247,7 +247,29 @@
         // Biến để xác định ngày kết thúc tối đa
         // Bạn có thể thay đổi giá trị này tùy ý hoặc thiết lập nó dựa trên một điều kiện nào đó
         // Ví dụ: thiết lập ngày kết thúc tối đa là hôm nay
-        let maxEndDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        let maxEndDate = formatDate(new Date()); // 'DD/MM/YYYY'
+
+        // Hàm để định dạng đối tượng Date thành chuỗi 'DD/MM/YYYY'
+        function formatDate(date) {
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+            let year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Hàm để chuyển đổi chuỗi 'DD/MM/YYYY' thành đối tượng Date
+        function parseDate(str) {
+            const parts = str.split('/');
+            if (parts.length !== 3) return null;
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // Tháng bắt đầu từ 0
+            const year = parseInt(parts[2], 10);
+            const date = new Date(year, month, day);
+            if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
+                return null; // Ngày không hợp lệ
+            }
+            return date;
+        }
 
         // Hàm để đăng xuất người dùng
         function logout() {
@@ -298,7 +320,7 @@
                 // Cập nhật dữ liệu lên trang web
                 document.getElementById('field1').innerText = latestFeed.field1 || 'Không có dữ liệu';
                 document.getElementById('field2').innerText = latestFeed.field2 || 'Không có dữ liệu';
-                document.getElementById('timestamp').innerText = latestFeed.created_at ? new Date(latestFeed.created_at).toLocaleString() : 'Không có dữ liệu';
+                document.getElementById('timestamp').innerText = latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu';
 
                 // Cập nhật dữ liệu trong bảng nếu bảng đang hiển thị
                 if (document.getElementById('dataTable').style.display === 'table') {
@@ -307,7 +329,7 @@
                         addRowToTable(
                             latestFeed.field1 || 'Không có dữ liệu',
                             latestFeed.field2 || 'Không có dữ liệu',
-                            latestFeed.created_at ? new Date(latestFeed.created_at).toLocaleString() : 'Không có dữ liệu'
+                            latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu'
                         );
                         lastEntryID = latestFeed.entry_id;
                     }
@@ -345,10 +367,11 @@
 
                 // Thêm các dòng vào bảng
                 feeds.forEach(feed => {
+                    const createdAtDate = feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu';
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
-                        feed.created_at ? new Date(feed.created_at).toLocaleString() : 'Không có dữ liệu'
+                        createdAtDate
                     );
                     lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
                 });
@@ -364,13 +387,23 @@
         }
 
         // Hàm để lấy dữ liệu lịch sử và tạo bảng
-        async function fetchHistoricalData(startDate, endDate) {
+        async function fetchHistoricalData(startDateStr, endDateStr) {
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
 
+            // Chuyển đổi chuỗi ngày sang đối tượng Date
+            const startDate = parseDate(startDateStr);
+            const endDate = parseDate(endDateStr);
+
+            if (!startDate || !endDate) {
+                document.getElementById('filterMessage').innerText = 'Định dạng ngày không hợp lệ.';
+                document.getElementById('dataTable').style.display = 'none';
+                return;
+            }
+
             // Construct start and end datetime in ISO format
-            const startDateTime = `${startDate}T00:00:00Z`;
-            const endDateTime = `${endDate}T23:59:59Z`;
+            const startDateTime = `${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}T00:00:00Z`;
+            const endDateTime = `${endDate.getFullYear()}-${String(endDate.getMonth()+1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}T23:59:59Z`;
 
             const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDateTime}&end=${endDateTime}&timezone=UTC`;
 
@@ -393,7 +426,7 @@
                 }
 
                 // Lọc dữ liệu không vượt quá maxEndDate
-                const maxAllowedDate = new Date(maxEndDate + 'T23:59:59Z');
+                const maxAllowedDate = parseDate(maxEndDate);
                 feeds = feeds.filter(feed => {
                     if (feed.created_at) {
                         const feedDate = new Date(feed.created_at);
@@ -414,10 +447,11 @@
 
                 // Thêm các dòng vào bảng
                 feeds.forEach(feed => {
+                    const createdAtDate = feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu';
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
-                        feed.created_at ? new Date(feed.created_at).toLocaleString() : 'Không có dữ liệu'
+                        createdAtDate
                     );
                     lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
                 });
@@ -460,14 +494,24 @@
             }
 
             // Kiểm tra logic ngày tháng
-            if (new Date(startDateInput) > new Date(endDateInput)) {
+            const startDate = parseDate(startDateInput);
+            const endDate = parseDate(endDateInput);
+
+            if (!startDate || !endDate) {
+                filterMessage.style.color = 'red';
+                filterMessage.innerText = 'Định dạng ngày không hợp lệ.';
+                return;
+            }
+
+            if (startDate > endDate) {
                 filterMessage.style.color = 'red';
                 filterMessage.innerText = 'Ngày bắt đầu không được lớn hơn ngày kết thúc.';
                 return;
             }
 
             // Kiểm tra và giới hạn ngày kết thúc không vượt quá maxEndDate
-            if (endDateInput > maxEndDate) {
+            const maxAllowedDate = parseDate(maxEndDate);
+            if (endDate > maxAllowedDate) {
                 endDateInput = maxEndDate;
                 document.getElementById('endDate').value = maxEndDate; // Cập nhật lại giá trị trong input
                 filterMessage.style.color = 'orange';
@@ -477,12 +521,8 @@
                 filterMessage.innerText = '';
             }
 
-            // Chuyển đổi định dạng ngày
-            const startDate = startDateInput; // YYYY-MM-DD
-            const endDate = endDateInput;     // YYYY-MM-DD
-
             // Gọi hàm fetchHistoricalData với ngày đã chọn
-            await fetchHistoricalData(startDate, endDate);
+            await fetchHistoricalData(startDateInput, endDateInput);
         }
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
@@ -498,20 +538,34 @@
             }, 1000); // 1000 milliseconds = 1 giây
         }
 
-        // Hàm kiểm tra trạng thái đăng nhập
-        function checkLoginStatus() {
-            // Kiểm tra xem người dùng đã đăng nhập hay chưa
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-            if (isLoggedIn !== 'true') {
-                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
-                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
-            }
-        }
+        // Hàm để thiết lập maxEndDate từ input của người dùng
+        function setMaxEndDate() {
+            const maxEndDateInput = document.getElementById('maxEndDateInput').value;
+            const setMaxEndDateMessage = document.getElementById('setMaxEndDateMessage');
 
-        // Hàm để khởi động quá trình tự động cập nhật
-        function startAutoUpdate() {
-            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
-            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
+            if (maxEndDateInput === '') {
+                setMaxEndDateMessage.style.color = 'red';
+                setMaxEndDateMessage.innerText = 'Vui lòng chọn ngày.';
+                return;
+            }
+
+            // Kiểm tra định dạng ngày
+            const parsedMaxEndDate = parseDate(maxEndDateInput);
+            if (!parsedMaxEndDate) {
+                setMaxEndDateMessage.style.color = 'red';
+                setMaxEndDateMessage.innerText = 'Định dạng ngày không hợp lệ.';
+                return;
+            }
+
+            // Cập nhật biến maxEndDate
+            maxEndDate = maxEndDateInput;
+
+            // Cập nhật thuộc tính max cho input endDate
+            const endDateInputElement = document.getElementById('endDate');
+            endDateInputElement.setAttribute('max', maxEndDate);
+
+            setMaxEndDateMessage.style.color = 'green';
+            setMaxEndDateMessage.innerText = `Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate}.`;
         }
 
         // Khi trang tải
@@ -549,11 +603,33 @@
             if (emergencyBtn) {
                 emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
             }
+
+            // Thêm sự kiện cho nút "Thiết lập maxEndDate"
+            const setMaxEndDateBtn = document.getElementById('setMaxEndDateButton');
+            if (setMaxEndDateBtn) {
+                setMaxEndDateBtn.addEventListener('click', setMaxEndDate);
+            }
         });
+
+        // Hàm kiểm tra trạng thái đăng nhập
+        function checkLoginStatus() {
+            // Kiểm tra xem người dùng đã đăng nhập hay chưa
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
+                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
+            }
+        }
+
+        // Hàm để khởi động quá trình tự động cập nhật
+        function startAutoUpdate() {
+            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
+            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
+        }
     </script>
 </head>
 <body>
-    <h1> hihi
+    <h1>
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
@@ -574,11 +650,19 @@
     <!-- Thanh nhập ngày và nút lọc dữ liệu -->
     <div class="filter-container">
         <label for="startDate">Ngày bắt đầu:</label>
-        <input type="date" id="startDate" placeholder="dd/mm/yyyy">
+        <input type="text" id="startDate" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}" title="Định dạng: DD/MM/YYYY">
         <label for="endDate">Ngày kết thúc:</label>
-        <input type="date" id="endDate" placeholder="dd/mm/yyyy">
+        <input type="text" id="endDate" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}" title="Định dạng: DD/MM/YYYY">
         <button id="filterButton">Lọc dữ liệu</button>
         <div id="filterMessage" class="filter-message"></div>
+    </div>
+
+    <!-- Trường nhập để thiết lập maxEndDate -->
+    <div class="filter-container">
+        <label for="maxEndDateInput">Ngày kết thúc tối đa:</label>
+        <input type="text" id="maxEndDateInput" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}" title="Định dạng: DD/MM/YYYY">
+        <button id="setMaxEndDateButton">Thiết lập</button>
+        <div id="setMaxEndDateMessage" class="filter-message"></div>
     </div>
 
     <!-- Nút để hiển thị bảng dữ liệu -->
