@@ -255,7 +255,7 @@
             let hours = String(date.getHours()).padStart(2, '0');
             let minutes = String(date.getMinutes()).padStart(2, '0');
             let seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+            return ${day}/${month}/${year} ${hours}:${minutes}:${seconds};
         }
 
         // Hàm để chuyển đổi chuỗi 'DD/MM/YYYY' thành đối tượng Date
@@ -302,12 +302,12 @@
         async function fetchData() {
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20`;
+            const url = https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20;
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(HTTP error! Status: ${response.status});
                 }
                 const data = await response.json();
                 const feeds = data.feeds;
@@ -350,12 +350,12 @@
         async function fetchAllData() {
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000`; // Tăng 'results' để lấy nhiều dữ liệu hơn
+            const url = https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000; // Tăng 'results' để lấy nhiều dữ liệu hơn
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(HTTP error! Status: ${response.status});
                 }
                 const data = await response.json();
                 let feeds = data.feeds;
@@ -410,15 +410,15 @@
             }
 
             // Construct start and end datetime in ISO format
-            const startDateTime = `${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}T00:00:00Z`;
-            const endDateTime = `${endDate.getFullYear()}-${String(endDate.getMonth()+1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}T23:59:59Z`;
+            const startDateTime = ${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}T00:00:00Z;
+            const endDateTime = ${endDate.getFullYear()}-${String(endDate.getMonth()+1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}T23:59:59Z;
 
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDateTime}&end=${endDateTime}&timezone=UTC`;
+            const url = https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&start=${startDateTime}&end=${endDateTime}&timezone=UTC;
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    throw new Error(HTTP error! Status: ${response.status});
                 }
                 const data = await response.json();
                 let feeds = data.feeds;
@@ -525,7 +525,7 @@
                 endDateInput = maxAllowedDate;
                 document.getElementById('endDate').value = formatDate(maxAllowedDate).split(' ')[0]; // Cập nhật lại giá trị trong input (chỉ ngày)
                 filterMessage.style.color = 'orange';
-                filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${formatDate(maxAllowedDate).split(' ')[0]}.`;
+                filterMessage.innerText = Ngày kết thúc đã được giới hạn tại ${formatDate(maxAllowedDate).split(' ')[0]}.;
             } else {
                 filterMessage.style.color = 'green';
                 filterMessage.innerText = '';
@@ -546,6 +546,19 @@
             setTimeout(function() {
                 window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
             }, 1000); // 1000 milliseconds = 1 giây
+        }
+
+         // Hàm để gửi lệnh đăng ký vân tay lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
+         function sendRegisterFingerprintCommand() {
+            const esp32URL = 'http://192.168.1.8/register_fingerprint'; // Địa chỉ IP của ESP32
+
+            // Mở ESP32 endpoint để kích hoạt đăng ký vân tay
+            window.location.href = esp32URL;
+
+            // (Tùy chọn) Sau một khoảng thời gian, quay lại dashboard.html nếu cần
+            // setTimeout(function() {
+            //     window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
+            // }, 1000); // 1000 milliseconds = 1 giây
         }
 
         // Hàm để thiết lập maxEndDate từ input của người dùng
@@ -575,7 +588,7 @@
             endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]); // Chỉ đặt phần ngày
 
             setMaxEndDateMessage.style.color = 'green';
-            setMaxEndDateMessage.innerText = `Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate.split(' ')[0]}.`;
+            setMaxEndDateMessage.innerText = Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate.split(' ')[0]}.;
         }
 
         // Hàm kiểm tra trạng thái đăng nhập
@@ -605,7 +618,7 @@
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
                 const seconds = String(now.getSeconds()).padStart(2, '0');
-                liveClockElement.innerText = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+                liveClockElement.innerText = ${day}/${month}/${year} ${hours}:${minutes}:${seconds};
             }
             updateClock(); // Cập nhật ngay lập tức khi tải trang
             setInterval(updateClock, 1000); // Cập nhật mỗi giây
@@ -696,6 +709,12 @@
             if (setMaxEndDateBtn) {
                 setMaxEndDateBtn.addEventListener('click', setMaxEndDate);
             }
+
+            // Thêm sự kiện cho nút "Đăng Ký Vân Tay"
+            const registerFingerprintBtn = document.getElementById('registerFingerprintButton');
+            if (registerFingerprintBtn) {
+                registerFingerprintBtn.addEventListener('click', sendRegisterFingerprintCommand);
+            }
         });
     </script>
 </head>
@@ -745,6 +764,9 @@
 
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
+
+    <!-- Thêm nút Đăng Ký Vân Tay vào phần giao diện -->
+    <button id="registerFingerprintButton">Đăng Ký Vân Tay</button>
 
     <!-- Bảng dữ liệu -->
     <table id="dataTable">
