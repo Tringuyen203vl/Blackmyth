@@ -37,7 +37,7 @@
             width: 100%;
             max-width: 800px;
         }
-
+aaaaaaâ
         /* Nút Đăng Xuất */
         #logoutButton {
             padding: 8px 16px;
@@ -113,7 +113,7 @@
         }
 
         /* Button styling */
-        #toggleButton, #showAllButton {
+        #toggleButton {
             margin-top: 30px;
             padding: 10px 20px;
             font-size: 1em;
@@ -123,10 +123,9 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-right: 10px; /* Thêm khoảng cách giữa các nút */
         }
 
-        #toggleButton:hover, #showAllButton:hover {
+        #toggleButton:hover {
             background-color: #45a049;
         }
 
@@ -164,12 +163,6 @@
 
             #dataTable {
                 width: 100%;
-            }
-
-            /* Điều chỉnh các nút để hiển thị dọc trên thiết bị nhỏ */
-            #toggleButton, #showAllButton {
-                margin-right: 0;
-                margin-bottom: 10px;
             }
         }
 
@@ -322,6 +315,49 @@
             }
         }
 
+        // Hàm để lấy tất cả dữ liệu từ ThingSpeak và hiển thị trong bảng
+        async function fetchAllData() {
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
+            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000`; // Tăng 'results' để lấy nhiều dữ liệu hơn
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                const feeds = data.feeds;
+
+                if (feeds.length === 0) {
+                    console.warn('Không có dữ liệu từ ThingSpeak.');
+                    return;
+                }
+
+                // Xóa dữ liệu cũ trong bảng
+                const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+
+                // Thêm các dòng vào bảng
+                feeds.forEach(feed => {
+                    addRowToTable(
+                        feed.field1 || 'Không có dữ liệu',
+                        feed.field2 || 'Không có dữ liệu',
+                        feed.created_at ? new Date(feed.created_at).toLocaleString() : 'Không có dữ liệu'
+                    );
+                    lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
+                });
+
+                // Hiển thị bảng dữ liệu
+                document.getElementById('dataTable').style.display = 'table';
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu:', error);
+                document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi tải dữ liệu.';
+                // Ẩn bảng nếu có lỗi
+                document.getElementById('dataTable').style.display = 'none';
+            }
+        }
+
         // Hàm để lấy dữ liệu lịch sử và tạo bảng
         async function fetchHistoricalData(startDate, endDate) {
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
@@ -379,82 +415,17 @@
             }
         }
 
-        // Hàm để lấy toàn bộ dữ liệu và tạo bảng
-        async function fetchAllData() {
-            const channelID = '2783657'; // Thay bằng Channel ID của bạn
-            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=800`; // Lấy tối đa 800 kết quả
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                const data = await response.json();
-                const feeds = data.feeds;
-
-                if (feeds.length === 0) {
-                    // Hiển thị thông báo không có dữ liệu
-                    alert('Không có dữ liệu để hiển thị.');
-                    // Ẩn bảng nếu đang hiển thị
-                    document.getElementById('dataTable').style.display = 'none';
-                    return;
-                }
-
-                // Xóa dữ liệu cũ trong bảng
-                const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-                tableBody.innerHTML = '';
-
-                // Thêm các dòng vào bảng
-                feeds.forEach(feed => {
-                    addRowToTable(
-                        feed.field1 || 'Không có dữ liệu',
-                        feed.field2 || 'Không có dữ liệu',
-                        feed.created_at ? new Date(feed.created_at).toLocaleString() : 'Không có dữ liệu'
-                    );
-                    lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
-                });
-
-                // Hiển thị bảng dữ liệu
-                document.getElementById('dataTable').style.display = 'table';
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu lịch sử:', error);
-                alert('Có lỗi xảy ra khi lấy dữ liệu lịch sử.');
-                // Ẩn bảng nếu có lỗi
-                document.getElementById('dataTable').style.display = 'none';
-            }
-        }
-
-        // Hàm để toggle hiển thị bảng dựa trên lọc dữ liệu
+        // Hàm để toggle hiển thị bảng
         async function toggleTable() {
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
-                // Lấy giá trị ngày hiện tại hoặc mặc định
-                const startDateInput = document.getElementById('startDate').value.trim() || '01/01/2023';
-                const endDateInput = document.getElementById('endDate').value.trim() || '31/12/2023';
-                const startDate = convertDateFormat(startDateInput);
-                const endDate = convertDateFormat(endDateInput);
-                await fetchHistoricalData(startDate, endDate);
+                await fetchAllData(); // Fetch all data without date filters
             } else {
                 dataTable.style.display = 'none';
                 toggleButton.innerText = 'Hiển thị danh sách';
-            }
-        }
-
-        // Hàm để hiển thị toàn bộ dữ liệu khi nhấn nút "Hiển thị toàn bộ danh sách"
-        async function showAllData() {
-            const dataTable = document.getElementById('dataTable');
-            const showAllButton = document.getElementById('showAllButton');
-            if (dataTable.style.display === 'none' || dataTable.style.display === '') {
-                dataTable.style.display = 'table';
-                showAllButton.innerText = 'Ẩn toàn bộ danh sách';
-                await fetchAllData();
-            } else {
-                dataTable.style.display = 'none';
-                showAllButton.innerText = 'Hiển thị toàn bộ danh sách';
             }
         }
 
@@ -537,12 +508,6 @@
                 toggleBtn.addEventListener('click', toggleTable);
             }
 
-            // Thêm sự kiện cho nút "Hiển thị toàn bộ danh sách"
-            const showAllBtn = document.getElementById('showAllButton');
-            if (showAllBtn) {
-                showAllBtn.addEventListener('click', showAllData);
-            }
-
             // Thêm sự kiện cho nút "Lọc dữ liệu"
             const filterBtn = document.getElementById('filterButton');
             if (filterBtn) {
@@ -602,11 +567,8 @@
         <div id="filterMessage" class="filter-message"></div>
     </div>
 
-    <!-- Nút để hiển thị bảng dữ liệu theo lọc -->
+    <!-- Nút để hiển thị bảng dữ liệu -->
     <button id="toggleButton">Hiển thị danh sách</button>
-    
-    <!-- Nút để hiển thị toàn bộ danh sách -->
-    <button id="showAllButton">Hiển thị toàn bộ danh sách</button>
 
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
