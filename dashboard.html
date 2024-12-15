@@ -217,7 +217,7 @@
             // sessionStorage.clear();
             
             // Chuyển hướng người dùng về trang đăng nhập
-            window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
+            window.location.href = 'index.html';
         }
 
         // Hàm để tạo hàng mới trong bảng
@@ -344,16 +344,17 @@
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
-                // Lấy giá trị ngày hiện tại hoặc mặc định
-                const startDateInput = document.getElementById('startDate').value.trim() || '01/01/2023';
-                const endDateInput = document.getElementById('endDate').value.trim() || '31/12/2023';
-                const startDate = convertDateFormat(startDateInput);
-                const endDate = convertDateFormat(endDateInput);
-                await fetchHistoricalData(startDate, endDate);
+                await fetchHistoricalData(); // Lấy dữ liệu lịch sử khi bảng được hiển thị
             } else {
                 dataTable.style.display = 'none';
                 toggleButton.innerText = 'Hiển thị danh sách';
             }
+        }
+
+        // Hàm để khởi động quá trình tự động cập nhật
+        function startAutoUpdate() {
+            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
+            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
         }
 
         // Hàm để chuyển đổi định dạng ngày từ dd/mm/yyyy sang yyyy-mm-dd
@@ -402,17 +403,35 @@
             await fetchHistoricalData(startDate, endDate);
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
-        function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ThingSpeak
+        async function sendEmergencyOpenCommand() {
+            const apiKey = 'VG8Y7EE81T7ATTOD'; // Thay bằng API Write Key của bạn
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn (không cần thiết cho POST /update)
+            const fieldNumber = 4; // Sử dụng field4 cho lệnh
 
-            // Mở ESP32 endpoint để kích hoạt mở cửa
-            window.location.href = esp32URL;
+            const url = `https://api.thingspeak.com/update`;
 
-            // Sau 1 giây, quay lại dashboard.html
-            setTimeout(function() {
-                window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
-            }, 1000); // 1000 milliseconds = 1 giây
+            const payload = `api_key=${apiKey}&field${fieldNumber}=open_door`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: payload
+                });
+
+                if (response.ok) {
+                    console.log('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                    alert('Lệnh mở cửa khẩn cấp đã được gửi thành công.');
+                } else {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Lỗi khi gửi lệnh mở cửa:', error);
+                alert('Có lỗi xảy ra khi gửi lệnh mở cửa.');
+            }
         }
 
         // Khi trang tải
@@ -454,14 +473,8 @@
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             if (isLoggedIn !== 'true') {
                 // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
-                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
+                window.location.href = 'index.html';
             }
-        }
-
-        // Hàm để khởi động quá trình tự động cập nhật
-        function startAutoUpdate() {
-            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
-            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
         }
     </script>
 </head>
