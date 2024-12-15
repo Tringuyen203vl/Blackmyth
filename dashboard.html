@@ -558,7 +558,7 @@
 
         // Hàm để gửi yêu cầu đăng ký vân tay
         function sendRegisterFingerprintCommand() {
-            fetch('http://192.168.1.8/register_fingerprint')
+            fetch('http://192.168.1.8/registerfingerprint')
                 .then(response => response.text())
                 .then(data => {
                     alert(data); // Hiển thị thông báo từ ESP32
