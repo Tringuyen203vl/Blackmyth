@@ -558,16 +558,11 @@
 
         // Hàm để gửi yêu cầu đăng ký vân tay
         function sendRegisterFingerprintCommand() {
-            const esp32URL = 'http://192.168.1.8/registerfingerprint';
-                .then(response => response.text())
-                .then(data => {
-                    alert(data); // Hiển thị thông báo từ ESP32
-                })
-                .catch(error => {
-                    console.error('Lỗi khi gửi yêu cầu:', error);
-                    alert('Không thể gửi yêu cầu đăng ký vân tay.');
-                });
-              // Sau 1 giây, quay lại dashboard.html
+            const esp32URL1 = 'http://192.168.1.8/registerfingerprint';
+               // Mở ESP32 endpoint để kích hoạt mở cửa
+            window.location.href = esp32URL;
+
+            // Sau 1 giây, quay lại dashboard.html
             setTimeout(function() {
                 window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
             }, 1000); // 1000 milliseconds = 1 giây
@@ -745,7 +740,7 @@
 </head>
 <body>
     <h1>
-        klp
+        klp24
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
