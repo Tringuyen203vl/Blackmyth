@@ -244,6 +244,11 @@
     <script>
         let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
 
+        // Biến để xác định ngày kết thúc tối đa
+        // Bạn có thể thay đổi giá trị này tùy ý hoặc thiết lập nó dựa trên một điều kiện nào đó
+        // Ví dụ: thiết lập ngày kết thúc tối đa là hôm nay
+        let maxEndDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
         // Hàm để đăng xuất người dùng
         function logout() {
             // Xóa trạng thái đăng nhập khỏi sessionStorage
@@ -387,8 +392,8 @@
                     document.getElementById('filterMessage').innerText = '';
                 }
 
-                // Lọc dữ liệu không vượt quá 14/12/2024
-                const maxAllowedDate = new Date('2024-12-14T23:59:59Z');
+                // Lọc dữ liệu không vượt quá maxEndDate
+                const maxAllowedDate = new Date(maxEndDate + 'T23:59:59Z');
                 feeds = feeds.filter(feed => {
                     if (feed.created_at) {
                         const feedDate = new Date(feed.created_at);
@@ -447,16 +452,6 @@
             let endDateInput = document.getElementById('endDate').value;
             const filterMessage = document.getElementById('filterMessage');
 
-            // Giới hạn ngày kết thúc không được vượt quá 14/12/2024
-            const maxEndDate = '2024-12-14';
-
-            if (endDateInput > maxEndDate) {
-                endDateInput = maxEndDate;
-                document.getElementById('endDate').value = maxEndDate; // Cập nhật lại giá trị trong input
-                filterMessage.style.color = 'orange';
-                filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${maxEndDate}.`;
-            }
-
             // Kiểm tra xem cả hai trường đã được nhập đầy đủ chưa
             if (startDateInput === '' || endDateInput === '') {
                 filterMessage.style.color = 'red';
@@ -464,16 +459,27 @@
                 return;
             }
 
-            // Chuyển đổi định dạng ngày
-            const startDate = startDateInput; // YYYY-MM-DD
-            const endDate = endDateInput;     // YYYY-MM-DD
-
             // Kiểm tra logic ngày tháng
-            if (new Date(startDate) > new Date(endDate)) {
+            if (new Date(startDateInput) > new Date(endDateInput)) {
                 filterMessage.style.color = 'red';
                 filterMessage.innerText = 'Ngày bắt đầu không được lớn hơn ngày kết thúc.';
                 return;
             }
+
+            // Kiểm tra và giới hạn ngày kết thúc không vượt quá maxEndDate
+            if (endDateInput > maxEndDate) {
+                endDateInput = maxEndDate;
+                document.getElementById('endDate').value = maxEndDate; // Cập nhật lại giá trị trong input
+                filterMessage.style.color = 'orange';
+                filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${maxEndDate}.`;
+            } else {
+                filterMessage.style.color = 'green';
+                filterMessage.innerText = '';
+            }
+
+            // Chuyển đổi định dạng ngày
+            const startDate = startDateInput; // YYYY-MM-DD
+            const endDate = endDateInput;     // YYYY-MM-DD
 
             // Gọi hàm fetchHistoricalData với ngày đã chọn
             await fetchHistoricalData(startDate, endDate);
@@ -492,8 +498,28 @@
             }, 1000); // 1000 milliseconds = 1 giây
         }
 
+        // Hàm kiểm tra trạng thái đăng nhập
+        function checkLoginStatus() {
+            // Kiểm tra xem người dùng đã đăng nhập hay chưa
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
+                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
+            }
+        }
+
+        // Hàm để khởi động quá trình tự động cập nhật
+        function startAutoUpdate() {
+            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
+            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
+        }
+
         // Khi trang tải
         window.addEventListener('load', function() {
+            // Thiết lập ngày kết thúc tối đa cho input endDate
+            const endDateInputElement = document.getElementById('endDate');
+            endDateInputElement.setAttribute('max', maxEndDate);
+
             // Kiểm tra đăng nhập
             checkLoginStatus();
 
@@ -524,22 +550,6 @@
                 emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
             }
         });
-
-        // Hàm kiểm tra trạng thái đăng nhập
-        function checkLoginStatus() {
-            // Kiểm tra xem người dùng đã đăng nhập hay chưa
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-            if (isLoggedIn !== 'true') {
-                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
-                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
-            }
-        }
-
-        // Hàm để khởi động quá trình tự động cập nhật
-        function startAutoUpdate() {
-            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
-            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
-        }
     </script>
 </head>
 <body>
@@ -566,7 +576,7 @@
         <label for="startDate">Ngày bắt đầu:</label>
         <input type="date" id="startDate" placeholder="dd/mm/yyyy">
         <label for="endDate">Ngày kết thúc:</label>
-        <input type="date" id="endDate" placeholder="dd/mm/yyyy" max="2024-12-14">
+        <input type="date" id="endDate" placeholder="dd/mm/yyyy">
         <button id="filterButton">Lọc dữ liệu</button>
         <div id="filterMessage" class="filter-message"></div>
     </div>
