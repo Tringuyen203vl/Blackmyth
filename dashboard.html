@@ -456,7 +456,7 @@
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
         function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
+            const esp32URL = 'http://192.168.1.8/emergency_open'; // Địa chỉ IP của ESP32
 
             // Mở ESP32 endpoint để kích hoạt mở cửa
             window.location.href = esp32URL;
@@ -469,7 +469,7 @@
 
         // Hàm để gửi lệnh đăng ký vân tay mới lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
         function sendEnrollFingerprintCommand() {
-            const esp32URL = 'http://192.168.1.10/enroll'; // Thay bằng địa chỉ IP của ESP32 của bạn
+            const esp32URL = 'http://192.168.1.8/enroll'; // Thay bằng địa chỉ IP của ESP32 của bạn
 
             // Gửi yêu cầu tới ESP32 để bắt đầu quá trình đăng ký vân tay
             fetch(esp32URL)
