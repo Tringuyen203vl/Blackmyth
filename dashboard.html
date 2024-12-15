@@ -284,9 +284,10 @@
         }
 
         // Hàm để tạo hàng mới trong bảng
-        function addRowToTable(field1, field2, timestamp) {
+        // Thêm tham số insertAtTop để xác định vị trí chèn hàng
+        function addRowToTable(field1, field2, timestamp, insertAtTop = false) {
             const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
+            const newRow = table.insertRow(insertAtTop ? 0 : -1); // 0 để chèn đầu, -1 để chèn cuối
 
             const cell1 = newRow.insertCell(0);
             const cell2 = newRow.insertCell(1);
@@ -331,7 +332,8 @@
                         addRowToTable(
                             latestFeed.field1 || 'Không có dữ liệu',
                             latestFeed.field2 || 'Không có dữ liệu',
-                            latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu'
+                            latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu',
+                            true // Chèn vào đầu bảng
                         );
                         lastEntryID = latestFeed.entry_id;
                     }
@@ -356,12 +358,15 @@
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const data = await response.json();
-                const feeds = data.feeds;
+                let feeds = data.feeds;
 
                 if (feeds.length === 0) {
                     console.warn('Không có dữ liệu từ ThingSpeak.');
                     return;
                 }
+
+                // Đảo ngược mảng feeds để có mục mới nhất lên trên cùng
+                feeds = feeds.reverse();
 
                 // Xóa dữ liệu cũ trong bảng
                 const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
@@ -373,7 +378,8 @@
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
-                        createdAtDate
+                        createdAtDate,
+                        false // Chèn vào cuối bảng (sau khi đã đảo ngược, đây là đúng thứ tự)
                     );
                     lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
                 });
@@ -454,7 +460,8 @@
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
-                        createdAtDate
+                        createdAtDate,
+                        false // Chèn vào cuối bảng
                     );
                     lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
                 });
@@ -652,7 +659,7 @@
     </script>
 </head>
 <body>
-    <h1>
+    <h1>kkkk
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
