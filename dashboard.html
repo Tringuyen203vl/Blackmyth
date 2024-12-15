@@ -25,6 +25,7 @@
             min-height: 100vh;
             padding: 20px;
             position: relative; /* Để chứa thanh thông tin chạy */
+            padding-bottom: 60px; /* Đảm bảo không bị chồng bởi running-info */
         }
 
         h1 {
@@ -138,7 +139,8 @@
             border-collapse: collapse;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
-            z-index: 1; /* Đảm bảo bảng trên cùng */
+            z-index: 1001; /* Cao hơn running-info */
+            position: relative;
         }
 
         #dataTable th, #dataTable td {
@@ -319,6 +321,7 @@
 
         // Hàm để lấy dữ liệu lịch sử và tạo bảng
         async function fetchHistoricalData(startDate, endDate) {
+            console.log(`fetchHistoricalData called with startDate: ${startDate}, endDate: ${endDate}`);
             const channelID = '2783657'; // Thay bằng Channel ID của bạn
             const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
 
@@ -379,6 +382,7 @@
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
+                console.log('Hiển thị bảng dữ liệu');
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
                 // Lấy giá trị ngày hiện tại hoặc mặc định
@@ -389,6 +393,7 @@
                 console.log(`Start Date: ${startDate}, End Date: ${endDate}`);
                 await fetchHistoricalData(startDate, endDate);
             } else {
+                console.log('Ẩn bảng dữ liệu');
                 dataTable.style.display = 'none';
                 toggleButton.innerText = 'Hiển thị danh sách';
             }
@@ -443,7 +448,7 @@
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách sử dụng fetch
         function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.8/emergency_open'; // Địa chỉ IP của ESP32
+            const esp32URL = 'http://192.168.1.10/emergency_open'; // Địa chỉ IP của ESP32
 
             fetch(esp32URL)
                 .then(response => response.text())
