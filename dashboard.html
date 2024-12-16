@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Dashboard Cập Nhật Tự Động</title>
     <style>
+        /* Reset một số thiết lập mặc định */
         * {
             margin: 0;
             padding: 0;
@@ -12,18 +13,18 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background-image: url('https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif');
+            background-image: url('https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif'); /* Thay bằng liên kết hình nền của bạn */
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-color: rgba(244, 246, 248, 0.8);
+            background-color: rgba(244, 246, 248, 0.8); /* Màu nền phụ nếu hình ảnh không tải được */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; 
+            justify-content: flex-start; /* Chỉnh sửa để không căn giữa hoàn toàn */
             min-height: 100vh;
             padding: 20px;
-            position: relative; 
+            position: relative; /* Để chứa thanh thông tin chạy */
         }
 
         h1 {
@@ -37,6 +38,7 @@
             max-width: 800px;
         }
 
+        /* Nút Đăng Xuất */
         #logoutButton {
             padding: 8px 16px;
             font-size: 1em;
@@ -52,11 +54,12 @@
             background-color: #d32f2f;
         }
 
+        /* Nút Mở Cửa Khẩn Cấp */
         #emergencyOpenButton {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
-            background-color: #f44336; 
+            background-color: #f44336; /* Màu đỏ để biểu thị khẩn cấp */
             color: white;
             border: none;
             border-radius: 5px;
@@ -68,11 +71,12 @@
             background-color: #d32f2f;
         }
 
+        /* Nút Đăng Ký Vân Tay */
         #registerFingerprintButton {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
-            background-color: #4CAF50; 
+            background-color: #4CAF50; /* Màu xanh lá để biểu thị đăng ký */
             color: white;
             border: none;
             border-radius: 5px;
@@ -84,22 +88,21 @@
             background-color: #45a049;
         }
 
-        /* Nút Hủy Đăng Ký Vân Tay (màu vàng) */
-        #cancelRegisterFingerprintButton {
+        /* Nút Hủy Đăng Ký Vân Tay */
+        #cancelRegisterButton {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
-            background-color: yellow; 
-            color: black;
+            background-color: #FFD700; /* Màu vàng */
+            color: #000;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-left: 10px;
         }
 
-        #cancelRegisterFingerprintButton:hover {
-            background-color: #f1f16b;
+        #cancelRegisterButton:hover {
+            background-color: #e6c200;
         }
 
         .data-container {
@@ -112,7 +115,7 @@
         }
 
         .data-item {
-            background-color: rgba(255, 255, 255, 0.9); 
+            background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
             border: 2px solid #4CAF50;
             border-radius: 10px;
             padding: 20px;
@@ -143,6 +146,7 @@
             color: #333;
         }
 
+        /* Button styling */
         #toggleButton {
             margin-top: 30px;
             padding: 10px 20px;
@@ -159,14 +163,15 @@
             background-color: #45a049;
         }
 
+        /* Table styling */
         #dataTable {
-            display: none; 
+            display: none; /* Ẩn bảng ban đầu */
             margin-top: 20px;
             width: 100%;
             max-width: 800px;
             border-collapse: collapse;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
         }
 
         #dataTable th, #dataTable td {
@@ -184,6 +189,7 @@
             background-color: #f2f2f2;
         }
 
+        /* Responsive Design */
         @media (max-width: 600px) {
             .data-item {
                 width: 100%;
@@ -194,6 +200,7 @@
             }
         }
 
+        /* Filter container styling */
         .filter-container {
             margin-top: 30px;
             display: flex;
@@ -239,6 +246,7 @@
             color: red;
         }
 
+        /* Thanh thông tin chạy từ trái sang phải */
         .running-info {
             position: fixed;
             bottom: 0;
@@ -255,7 +263,7 @@
             display: inline-block;
             padding-left: 100%;
             animation: scroll-left 15s linear infinite;
-            font-size: 1.2em; 
+            font-size: 1.2em; /* Tăng kích thước chữ ở đây */
         }
 
         @keyframes scroll-left {
@@ -268,12 +276,15 @@
         }
     </style>
     <script>
-        let lastEntryID = null; 
-        let maxEndDate = formatDate(new Date()); 
+        let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
 
+        // Biến để xác định ngày kết thúc tối đa
+        let maxEndDate = formatDate(new Date()); // 'DD/MM/YYYY HH:MM:SS'
+
+        // Hàm để định dạng đối tượng Date thành chuỗi 'DD/MM/YYYY HH:MM:SS'
         function formatDate(date) {
             let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
             let year = date.getFullYear();
             let hours = String(date.getHours()).padStart(2, '0');
             let minutes = String(date.getMinutes()).padStart(2, '0');
@@ -281,27 +292,32 @@
             return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
         }
 
+        // Hàm để chuyển đổi chuỗi 'DD/MM/YYYY' thành đối tượng Date
         function parseDate(str) {
             const parts = str.split('/');
             if (parts.length !== 3) return null;
             const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1;
+            const month = parseInt(parts[1], 10) - 1; // Tháng bắt đầu từ 0
             const year = parseInt(parts[2], 10);
             const date = new Date(year, month, day);
             if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
-                return null; 
+                return null; // Ngày không hợp lệ
             }
             return date;
         }
 
+        // Hàm để đăng xuất người dùng
         function logout() {
+            // Xóa trạng thái đăng nhập khỏi sessionStorage
             sessionStorage.removeItem('isLoggedIn');
+            // Chuyển hướng về trang đăng nhập
             window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
         }
 
+        // Hàm để tạo hàng mới trong bảng
         function addRowToTable(field1, field2, timestamp, insertAtTop = false) {
             const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow(insertAtTop ? 0 : -1);
+            const newRow = table.insertRow(insertAtTop ? 0 : -1); // 0 để chèn đầu, -1 để chèn cuối
 
             const cell1 = newRow.insertCell(0);
             const cell2 = newRow.insertCell(1);
@@ -312,9 +328,10 @@
             cell3.innerText = timestamp;
         }
 
+        // Hàm để lấy dữ liệu từ ThingSpeak
         async function fetchData() {
-            const channelID = '2783657'; 
-            const apiKey = 'FZUQDUYN7ON76T8P';  
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
             const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20`;
 
             try {
@@ -332,16 +349,18 @@
 
                 const latestFeed = feeds[feeds.length - 1];
 
+                // Cập nhật dữ liệu lên trang web
                 document.getElementById('field1').innerText = latestFeed.field1 || 'Không có dữ liệu';
                 document.getElementById('field2').innerText = latestFeed.field2 || 'Không có dữ liệu';
 
+                // Cập nhật dữ liệu trong bảng nếu bảng đang hiển thị
                 if (document.getElementById('dataTable').style.display === 'table') {
                     if (latestFeed.entry_id !== lastEntryID) {
                         addRowToTable(
                             latestFeed.field1 || 'Không có dữ liệu',
                             latestFeed.field2 || 'Không có dữ liệu',
                             latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu',
-                            true
+                            true // Chèn vào đầu bảng
                         );
                         lastEntryID = latestFeed.entry_id;
                     }
@@ -353,9 +372,10 @@
             }
         }
 
+        // Hàm để lấy tất cả dữ liệu từ ThingSpeak và hiển thị trong bảng
         async function fetchAllData() {
-            const channelID = '2783657'; 
-            const apiKey = 'FZUQDUYN7ON76T8P';  
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
             const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000`;
 
             try {
@@ -371,22 +391,26 @@
                     return;
                 }
 
+                // Đảo ngược mảng feeds để có mục mới nhất lên trên cùng
                 feeds = feeds.reverse();
 
+                // Xóa dữ liệu cũ trong bảng
                 const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
                 tableBody.innerHTML = '';
 
+                // Thêm các dòng vào bảng
                 feeds.forEach(feed => {
                     const createdAtDate = feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu';
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
                         createdAtDate,
-                        false
+                        false // Chèn vào cuối bảng
                     );
                     lastEntryID = feed.entry_id;
                 });
 
+                // Hiển thị bảng dữ liệu
                 document.getElementById('dataTable').style.display = 'table';
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
@@ -395,9 +419,10 @@
             }
         }
 
+        // Hàm để lấy dữ liệu lịch sử và tạo bảng
         async function fetchHistoricalData(startDateStr, endDateStr) {
-            const channelID = '2783657'; 
-            const apiKey = 'FZUQDUYN7ON76T8P'; 
+            const channelID = '2783657'; // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
 
             const startDate = parseDate(startDateStr);
             const endDate = parseDate(endDateStr);
@@ -432,7 +457,7 @@
                     document.getElementById('filterMessage').innerText = '';
                 }
 
-                const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]); 
+                const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]);
                 feeds = feeds.filter(feed => {
                     if (feed.created_at) {
                         const feedDate = new Date(feed.created_at);
@@ -471,6 +496,7 @@
             }
         }
 
+        // Hàm để toggle hiển thị bảng
         async function toggleTable() {
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
@@ -484,6 +510,7 @@
             }
         }
 
+        // Hàm để lọc dữ liệu theo ngày tháng
         async function filterData() {
             const startDateInput = document.getElementById('startDate').value;
             let endDateInput = document.getElementById('endDate').value;
@@ -511,7 +538,7 @@
                 return;
             }
 
-            const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]); 
+            const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]);
             if (endDate > maxAllowedDate) {
                 endDateInput = maxAllowedDate;
                 document.getElementById('endDate').value = formatDate(maxAllowedDate).split(' ')[0];
@@ -525,25 +552,28 @@
             await fetchHistoricalData(startDateInput, endDateInput);
         }
 
+        // Hàm gửi lệnh đăng ký vân tay
         function sendRegisterFingerprintCommand() {
             const esp32URL = 'http://192.168.1.6/register_fingerprint?key=YOUR_SECRET_KEY';
             window.location.href = esp32URL;
         }
 
-        // Hàm hủy đăng ký vân tay
+        // Hàm gửi lệnh hủy đăng ký vân tay
         function sendCancelRegisterCommand() {
-            const esp32URL = 'http://192.168.1.6/cancel_register?key=YOUR_SECRET_KEY'; 
+            const esp32URL = 'http://192.168.1.6/cancel_register?key=YOUR_SECRET_KEY';
             window.location.href = esp32URL;
         }
 
+        // Hàm gửi lệnh mở cửa khẩn cấp
         function sendEmergencyOpenCommand() {
             const esp32URL = 'http://192.168.1.6/emergency_open?key=YOUR_SECRET_KEY';
             window.location.href = esp32URL;
             setTimeout(function() {
-                window.location.href = 'dashboard.html'; 
+                window.location.href = 'dashboard.html';
             }, 1000);
         }
 
+        // Hàm để thiết lập maxEndDate từ input người dùng
         function setMaxEndDate() {
             const maxEndDateInput = document.getElementById('maxEndDateInput').value;
             const setMaxEndDateMessage = document.getElementById('setMaxEndDateMessage');
@@ -561,14 +591,14 @@
                 return;
             }
 
-            maxEndDate = formatDate(parsedMaxEndDate); 
+            maxEndDate = formatDate(parsedMaxEndDate);
             const endDateInputElement = document.getElementById('endDate');
             endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]);
-
             setMaxEndDateMessage.style.color = 'green';
             setMaxEndDateMessage.innerText = `Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate.split(' ')[0]}.`;
         }
 
+        // Hàm kiểm tra trạng thái đăng nhập
         function checkLoginStatus() {
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             if (isLoggedIn !== 'true') {
@@ -576,11 +606,13 @@
             }
         }
 
+        // Tự động cập nhật
         function startAutoUpdate() {
             fetchData();
             setInterval(fetchData, 3000);
         }
 
+        // Cập nhật đồng hồ trực tiếp
         function startLiveClock() {
             const liveClockElement = document.getElementById('liveClock');
             function updateClock() {
@@ -597,6 +629,7 @@
             setInterval(updateClock, 1000);
         }
 
+        // Tự động chèn dấu '/' vào các trường nhập ngày
         function autoFormatDate(input) {
             input.addEventListener('input', function(e) {
                 let value = input.value.replace(/\D/g, '');
@@ -673,8 +706,7 @@
                 registerBtn.addEventListener('click', sendRegisterFingerprintCommand);
             }
 
-            // Thêm sự kiện cho nút "Hủy Đăng Ký Vân Tay"
-            const cancelRegisterBtn = document.getElementById('cancelRegisterFingerprintButton');
+            const cancelRegisterBtn = document.getElementById('cancelRegisterButton');
             if (cancelRegisterBtn) {
                 cancelRegisterBtn.addEventListener('click', sendCancelRegisterCommand);
             }
@@ -683,7 +715,7 @@
 </head>
 <body>
     <h1>
-        van
+        GGGGGG
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
@@ -718,9 +750,11 @@
     </div>
 
     <button id="toggleButton">Hiển thị danh sách</button>
+    <!-- Nút Đăng Ký Vân Tay -->
     <button id="registerFingerprintButton">Đăng Ký Vân Tay</button>
-    <!-- Nút Hủy Đăng Ký Vân Tay -->
-    <button id="cancelRegisterFingerprintButton">Hủy Đăng Ký Vân Tay</button>
+    <!-- Nút Hủy Đăng Ký Vân Tay (Màu vàng) -->
+    <button id="cancelRegisterButton" style="background-color: #FFD700; color: #000;">Hủy Đăng Ký Vân Tay</button>
+    <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
 
     <table id="dataTable">
@@ -732,6 +766,7 @@
             </tr>
         </thead>
         <tbody>
+            <!-- Dữ liệu sẽ được thêm vào đây -->
         </tbody>
     </table>
 
