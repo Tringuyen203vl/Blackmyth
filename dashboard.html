@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Dashboard Cập Nhật Tự Động</title>
     <style>
-        /* Reset một số thiết lập mặc định */
+        /* Phần CSS giữ nguyên, thêm CSS cho nút hủy đăng ký vân tay */
         * {
             margin: 0;
             padding: 0;
@@ -13,18 +13,18 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background-image: url('https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif'); /* Thay bằng liên kết hình nền của bạn */
+            background-image: url('https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif'); 
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            background-color: rgba(244, 246, 248, 0.8); /* Màu nền phụ nếu hình ảnh không tải được */
+            background-color: rgba(244, 246, 248, 0.8);
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Chỉnh sửa để không căn giữa hoàn toàn */
+            justify-content: flex-start;
             min-height: 100vh;
             padding: 20px;
-            position: relative; /* Để chứa thanh thông tin chạy */
+            position: relative;
         }
 
         h1 {
@@ -38,7 +38,6 @@
             max-width: 800px;
         }
 
-        /* Nút Đăng Xuất */
         #logoutButton {
             padding: 8px 16px;
             font-size: 1em;
@@ -54,12 +53,11 @@
             background-color: #d32f2f;
         }
 
-        /* Nút Mở Cửa Khẩn Cấp */
         #emergencyOpenButton {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
-            background-color: #f44336; /* Màu đỏ để biểu thị khẩn cấp */
+            background-color: #f44336;
             color: white;
             border: none;
             border-radius: 5px;
@@ -71,12 +69,11 @@
             background-color: #d32f2f;
         }
 
-        /* Nút Đăng Ký Vân Tay */
         #registerFingerprintButton {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
-            background-color: #4CAF50; /* Màu xanh lá để biểu thị đăng ký */
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
@@ -86,6 +83,24 @@
 
         #registerFingerprintButton:hover {
             background-color: #45a049;
+        }
+
+        /* Thêm CSS cho nút Hủy Đăng Ký Vân Tay */
+        #cancelFingerprintButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: yellow; 
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-left: 10px; /* canh nút sang phải một chút */
+        }
+
+        #cancelFingerprintButton:hover {
+            background-color: #f1c40f;
         }
 
         .data-container {
@@ -98,7 +113,7 @@
         }
 
         .data-item {
-            background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
+            background-color: rgba(255, 255, 255, 0.9);
             border: 2px solid #4CAF50;
             border-radius: 10px;
             padding: 20px;
@@ -129,7 +144,6 @@
             color: #333;
         }
 
-        /* Button styling */
         #toggleButton {
             margin-top: 30px;
             padding: 10px 20px;
@@ -146,15 +160,14 @@
             background-color: #45a049;
         }
 
-        /* Table styling */
         #dataTable {
-            display: none; /* Ẩn bảng ban đầu */
+            display: none;
             margin-top: 20px;
             width: 100%;
             max-width: 800px;
             border-collapse: collapse;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            background-color: rgba(255, 255, 255, 0.9); /* Độ trong suốt để nhìn thấy hình nền */
+            background-color: rgba(255, 255, 255, 0.9);
         }
 
         #dataTable th, #dataTable td {
@@ -172,7 +185,6 @@
             background-color: #f2f2f2;
         }
 
-        /* Responsive Design */
         @media (max-width: 600px) {
             .data-item {
                 width: 100%;
@@ -183,7 +195,6 @@
             }
         }
 
-        /* Filter container styling */
         .filter-container {
             margin-top: 30px;
             display: flex;
@@ -229,7 +240,6 @@
             color: red;
         }
 
-        /* Thanh thông tin chạy từ trái sang phải */
         .running-info {
             position: fixed;
             bottom: 0;
@@ -246,7 +256,7 @@
             display: inline-block;
             padding-left: 100%;
             animation: scroll-left 15s linear infinite;
-            font-size: 1.2em; /* Tăng kích thước chữ ở đây */
+            font-size: 1.2em;
         }
 
         @keyframes scroll-left {
@@ -259,15 +269,12 @@
         }
     </style>
     <script>
-        let lastEntryID = null; // Biến để theo dõi entry ID cuối cùng đã được thêm vào bảng
+        let lastEntryID = null; 
+        let maxEndDate = formatDate(new Date());
 
-        // Biến để xác định ngày kết thúc tối đa
-        let maxEndDate = formatDate(new Date()); // 'DD/MM/YYYY HH:MM:SS'
-
-        // Hàm để định dạng đối tượng Date thành chuỗi 'DD/MM/YYYY HH:MM:SS'
         function formatDate(date) {
             let day = String(date.getDate()).padStart(2, '0');
-            let month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+            let month = String(date.getMonth() + 1).padStart(2, '0');
             let year = date.getFullYear();
             let hours = String(date.getHours()).padStart(2, '0');
             let minutes = String(date.getMinutes()).padStart(2, '0');
@@ -275,36 +282,27 @@
             return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
         }
 
-        // Hàm để chuyển đổi chuỗi 'DD/MM/YYYY' thành đối tượng Date
         function parseDate(str) {
             const parts = str.split('/');
             if (parts.length !== 3) return null;
             const day = parseInt(parts[0], 10);
-            const month = parseInt(parts[1], 10) - 1; // Tháng bắt đầu từ 0
+            const month = parseInt(parts[1], 10) - 1;
             const year = parseInt(parts[2], 10);
             const date = new Date(year, month, day);
             if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
-                return null; // Ngày không hợp lệ
+                return null;
             }
             return date;
         }
 
-        // Hàm để đăng xuất người dùng
         function logout() {
-            // Xóa trạng thái đăng nhập khỏi sessionStorage
             sessionStorage.removeItem('isLoggedIn');
-            // Hoặc bạn có thể xóa toàn bộ sessionStorage nếu không cần giữ dữ liệu khác
-            // sessionStorage.clear();
-            
-            // Chuyển hướng người dùng về trang đăng nhập
             window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
         }
 
-        // Hàm để tạo hàng mới trong bảng
-        // Thêm tham số insertAtTop để xác định vị trí chèn hàng
         function addRowToTable(field1, field2, timestamp, insertAtTop = false) {
             const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow(insertAtTop ? 0 : -1); // 0 để chèn đầu, -1 để chèn cuối
+            const newRow = table.insertRow(insertAtTop ? 0 : -1);
 
             const cell1 = newRow.insertCell(0);
             const cell2 = newRow.insertCell(1);
@@ -315,10 +313,9 @@
             cell3.innerText = timestamp;
         }
 
-        // Hàm để lấy dữ liệu từ ThingSpeak
         async function fetchData() {
-            const channelID = '2783657'; // Thay bằng Channel ID của bạn
-            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
+            const channelID = '2783657'; 
+            const apiKey = 'FZUQDUYN7ON76T8P'; 
             const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20`;
 
             try {
@@ -336,21 +333,16 @@
 
                 const latestFeed = feeds[feeds.length - 1];
 
-                // Cập nhật dữ liệu lên trang web
                 document.getElementById('field1').innerText = latestFeed.field1 || 'Không có dữ liệu';
                 document.getElementById('field2').innerText = latestFeed.field2 || 'Không có dữ liệu';
-                // Xóa dòng cập nhật 'timestamp'
-                // document.getElementById('timestamp').innerText = latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu';
 
-                // Cập nhật dữ liệu trong bảng nếu bảng đang hiển thị
                 if (document.getElementById('dataTable').style.display === 'table') {
-                    // Kiểm tra xem entry đã tồn tại chưa
                     if (latestFeed.entry_id !== lastEntryID) {
                         addRowToTable(
                             latestFeed.field1 || 'Không có dữ liệu',
                             latestFeed.field2 || 'Không có dữ liệu',
                             latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu',
-                            true // Chèn vào đầu bảng
+                            true
                         );
                         lastEntryID = latestFeed.entry_id;
                     }
@@ -359,15 +351,13 @@
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('field1').innerText = 'Lỗi';
                 document.getElementById('field2').innerText = 'Lỗi';
-                // document.getElementById('timestamp').innerText = 'Lỗi';
             }
         }
 
-        // Hàm để lấy tất cả dữ liệu từ ThingSpeak và hiển thị trong bảng
         async function fetchAllData() {
-            const channelID = '2783657'; // Thay bằng Channel ID của bạn
-            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
-            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000`; // Tăng 'results' để lấy nhiều dữ liệu hơn
+            const channelID = '2783657'; 
+            const apiKey = 'FZUQDUYN7ON76T8P'; 
+            const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000`;
 
             try {
                 const response = await fetch(url);
@@ -382,41 +372,34 @@
                     return;
                 }
 
-                // Đảo ngược mảng feeds để có mục mới nhất lên trên cùng
                 feeds = feeds.reverse();
 
-                // Xóa dữ liệu cũ trong bảng
                 const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
                 tableBody.innerHTML = '';
 
-                // Thêm các dòng vào bảng
                 feeds.forEach(feed => {
                     const createdAtDate = feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu';
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
                         createdAtDate,
-                        false // Chèn vào cuối bảng (sau khi đã đảo ngược, đây là đúng thứ tự)
+                        false
                     );
-                    lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
+                    lastEntryID = feed.entry_id;
                 });
 
-                // Hiển thị bảng dữ liệu
                 document.getElementById('dataTable').style.display = 'table';
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi tải dữ liệu.';
-                // Ẩn bảng nếu có lỗi
                 document.getElementById('dataTable').style.display = 'none';
             }
         }
 
-        // Hàm để lấy dữ liệu lịch sử và tạo bảng
         async function fetchHistoricalData(startDateStr, endDateStr) {
-            const channelID = '2783657'; // Thay bằng Channel ID của bạn
-            const apiKey = 'FZUQDUYN7ON76T8P';  // Thay bằng API Read Key của bạn
+            const channelID = '2783657'; 
+            const apiKey = 'FZUQDUYN7ON76T8P';
 
-            // Chuyển đổi chuỗi ngày sang đối tượng Date
             const startDate = parseDate(startDateStr);
             const endDate = parseDate(endDateStr);
 
@@ -427,7 +410,6 @@
                 return;
             }
 
-            // Construct start and end datetime in ISO format
             const startDateTime = `${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}T00:00:00Z`;
             const endDateTime = `${endDate.getFullYear()}-${String(endDate.getMonth()+1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}T23:59:59Z`;
 
@@ -442,10 +424,8 @@
                 let feeds = data.feeds;
 
                 if (feeds.length === 0) {
-                    // Hiển thị thông báo không có dữ liệu
                     document.getElementById('filterMessage').style.color = 'red';
                     document.getElementById('filterMessage').innerText = 'Dữ liệu không tồn tại.';
-                    // Ẩn bảng nếu đang hiển thị
                     document.getElementById('dataTable').style.display = 'none';
                     return;
                 } else {
@@ -453,8 +433,7 @@
                     document.getElementById('filterMessage').innerText = '';
                 }
 
-                // Lọc dữ liệu không vượt quá maxEndDate
-                const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]); // Chỉ so sánh ngày
+                const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]); 
                 feeds = feeds.filter(feed => {
                     if (feed.created_at) {
                         const feedDate = new Date(feed.created_at);
@@ -471,60 +450,52 @@
                     return;
                 }
 
-                // Xóa dữ liệu cũ trong bảng
                 const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
                 tableBody.innerHTML = '';
 
-                // Thêm các dòng vào bảng
                 feeds.forEach(feed => {
                     const createdAtDate = feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu';
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
                         createdAtDate,
-                        false // Chèn vào cuối bảng
+                        false
                     );
-                    lastEntryID = feed.entry_id; // Cập nhật entry ID cuối cùng
+                    lastEntryID = feed.entry_id;
                 });
 
-                // Hiển thị bảng dữ liệu
                 document.getElementById('dataTable').style.display = 'table';
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu lịch sử:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi lọc dữ liệu.';
-                // Ẩn bảng nếu có lỗi
                 document.getElementById('dataTable').style.display = 'none';
             }
         }
 
-        // Hàm để toggle hiển thị bảng
         async function toggleTable() {
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
             if (dataTable.style.display === 'none' || dataTable.style.display === '') {
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
-                await fetchAllData(); // Fetch all data without date filters
+                await fetchAllData();
             } else {
                 dataTable.style.display = 'none';
                 toggleButton.innerText = 'Hiển thị danh sách';
             }
         }
 
-        // Hàm để lọc dữ liệu theo ngày tháng
         async function filterData() {
             const startDateInput = document.getElementById('startDate').value;
             let endDateInput = document.getElementById('endDate').value;
             const filterMessage = document.getElementById('filterMessage');
 
-            // Kiểm tra xem cả hai trường đã được nhập đầy đủ chưa
             if (startDateInput === '' || endDateInput === '') {
                 filterMessage.style.color = 'red';
                 filterMessage.innerText = 'Vui lòng nhập đầy đủ ngày bắt đầu và kết thúc.';
                 return;
             }
 
-            // Kiểm tra logic ngày tháng
             const startDate = parseDate(startDateInput);
             const endDate = parseDate(endDateInput);
 
@@ -541,11 +512,10 @@
                 return;
             }
 
-            // Kiểm tra và giới hạn ngày kết thúc không vượt quá maxEndDate
-            const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]); // Chỉ so sánh ngày
+            const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]);
             if (endDate > maxAllowedDate) {
                 endDateInput = maxAllowedDate;
-                document.getElementById('endDate').value = formatDate(maxAllowedDate).split(' ')[0]; // Cập nhật lại giá trị trong input (chỉ ngày)
+                document.getElementById('endDate').value = formatDate(maxAllowedDate).split(' ')[0];
                 filterMessage.style.color = 'orange';
                 filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${formatDate(maxAllowedDate).split(' ')[0]}.`;
             } else {
@@ -553,51 +523,28 @@
                 filterMessage.innerText = '';
             }
 
-            // Gọi hàm fetchHistoricalData với ngày đã chọn
             await fetchHistoricalData(startDateInput, endDateInput);
         }
 
-        // Hàm để gửi yêu cầu đăng ký vân tay
         function sendRegisterFingerprintCommand() {
-            const esp32URL = 'http://192.168.1.6/register_fingerprint?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY bằng khóa bí mật của bạn
-            // Mở ESP32 endpoint để kích hoạt đăng ký vân tay
+            const esp32URL = 'http://192.168.1.6/register_fingerprint?key=YOUR_SECRET_KEY';
             window.location.href = esp32URL;
-
-            // **Xóa đoạn setTimeout này để không tự động quay lại dashboard**
-            /*
-            setTimeout(function() {
-                window.location.href = 'dashboard.html'; // Thay bằng tên file dashboard của bạn nếu khác
-            }, 1000); // 1000 milliseconds = 1 giây
-            */
         }
 
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
-        function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.6/emergency_open?key=YOUR_SECRET_KEY'; // Địa chỉ IP của ESP32 và thêm khóa bảo mật
-
-            // Mở ESP32 endpoint để kích hoạt mở cửa
+        // Thêm hàm gửi lệnh hủy đăng ký vân tay
+        function sendCancelRegisterCommand() {
+            const esp32URL = 'http://192.168.1.6/cancel_register?key=YOUR_SECRET_KEY';
             window.location.href = esp32URL;
-
-            // Sau 1 giây, quay lại dashboard.html
-            setTimeout(function() {
-                window.location.href = 'dashboard.html'; // Thay bằng URL chính xác của dashboard nếu khác
-            }, 1000); // 1000 milliseconds = 1 giây
-             }
-
-        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
-        function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.6/emergency_open?key=YOUR_SECRET_KEY'; // Địa chỉ IP của ESP32 và thêm khóa bảo mật
-
-            // Mở ESP32 endpoint để kích hoạt mở cửa
-            window.location.href = esp32URL;
-
-            // Sau 1 giây, quay lại dashboard.html
-            setTimeout(function() {
-                window.location.href = 'dashboard.html'; // Thay bằng URL chính xác của dashboard nếu khác
-            }, 1000); // 1000 millise
         }
 
-        // Hàm để thiết lập maxEndDate từ input của người dùng
+        function sendEmergencyOpenCommand() {
+            const esp32URL = 'http://192.168.1.6/emergency_open?key=YOUR_SECRET_KEY';
+            window.location.href = esp32URL;
+            setTimeout(function() {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        }
+
         function setMaxEndDate() {
             const maxEndDateInput = document.getElementById('maxEndDateInput').value;
             const setMaxEndDateMessage = document.getElementById('setMaxEndDateMessage');
@@ -608,7 +555,6 @@
                 return;
             }
 
-            // Kiểm tra định dạng ngày
             const parsedMaxEndDate = parseDate(maxEndDateInput);
             if (!parsedMaxEndDate) {
                 setMaxEndDateMessage.style.color = 'red';
@@ -616,54 +562,45 @@
                 return;
             }
 
-            // Cập nhật biến maxEndDate
-            maxEndDate = formatDate(parsedMaxEndDate); // Bao gồm cả giờ, phút, giây
-
-            // Cập nhật thuộc tính max cho input endDate
+            maxEndDate = formatDate(parsedMaxEndDate);
             const endDateInputElement = document.getElementById('endDate');
-            endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]); // Chỉ đặt phần ngày
+            endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]);
 
             setMaxEndDateMessage.style.color = 'green';
             setMaxEndDateMessage.innerText = `Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate.split(' ')[0]}.`;
         }
 
-        // Hàm kiểm tra trạng thái đăng nhập
         function checkLoginStatus() {
-            // Kiểm tra xem người dùng đã đăng nhập hay chưa
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             if (isLoggedIn !== 'true') {
-                // Nếu chưa đăng nhập, chuyển hướng về trang đăng nhập
                 window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
             }
         }
 
-        // Hàm để khởi động quá trình tự động cập nhật
         function startAutoUpdate() {
-            fetchData(); // Lấy dữ liệu ngay lập tức khi trang tải
-            setInterval(fetchData, 3000); // Lấy dữ liệu mỗi 3 giây
+            fetchData();
+            setInterval(fetchData, 3000);
         }
 
-        // Hàm để cập nhật đồng hồ trực tiếp
         function startLiveClock() {
             const liveClockElement = document.getElementById('liveClock');
             function updateClock() {
                 const now = new Date();
                 const day = String(now.getDate()).padStart(2, '0');
-                const month = String(now.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+                const month = String(now.getMonth() + 1).padStart(2, '0');
                 const year = now.getFullYear();
                 const hours = String(now.getHours()).padStart(2, '0');
                 const minutes = String(now.getMinutes()).padStart(2, '0');
                 const seconds = String(now.getSeconds()).padStart(2, '0');
                 liveClockElement.innerText = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
             }
-            updateClock(); // Cập nhật ngay lập tức khi tải trang
-            setInterval(updateClock, 1000); // Cập nhật mỗi giây
+            updateClock();
+            setInterval(updateClock, 1000);
         }
 
-        // Hàm để tự động chèn dấu '/' vào các trường nhập ngày
         function autoFormatDate(input) {
             input.addEventListener('input', function(e) {
-                let value = input.value.replace(/\D/g, ''); // Loại bỏ các ký tự không phải số
+                let value = input.value.replace(/\D/g, '');
                 if (value.length > 8) {
                     value = value.slice(0,8);
                 }
@@ -680,7 +617,6 @@
                 input.value = formattedValue;
             });
 
-            // Kiểm tra khi người dùng nhấn phím Backspace để loại bỏ dấu '/'
             input.addEventListener('keydown', function(e) {
                 if (e.key === 'Backspace') {
                     const value = input.value;
@@ -692,13 +628,10 @@
             });
         }
 
-        // Khi trang tải
         window.addEventListener('load', function() {
-            // Thiết lập ngày kết thúc tối đa cho input endDate
             const endDateInputElement = document.getElementById('endDate');
-            endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]); // Chỉ đặt phần ngày
+            endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]);
 
-            // Áp dụng tự động định dạng ngày cho các trường nhập ngày
             const dateInputs = ['startDate', 'endDate', 'maxEndDateInput'];
             dateInputs.forEach(id => {
                 const input = document.getElementById(id);
@@ -707,55 +640,50 @@
                 }
             });
 
-            // Kiểm tra đăng nhập
             checkLoginStatus();
-
-            // Khởi động tự động cập nhật
             startAutoUpdate();
-
-            // Khởi động đồng hồ trực tiếp
             startLiveClock();
 
-            // Thêm sự kiện cho nút "Đăng Xuất"
             const logoutBtn = document.getElementById('logoutButton');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', logout);
             }
 
-            // Thêm sự kiện cho nút "Hiển thị danh sách"
             const toggleBtn = document.getElementById('toggleButton');
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', toggleTable);
             }
 
-            // Thêm sự kiện cho nút "Lọc dữ liệu"
             const filterBtn = document.getElementById('filterButton');
             if (filterBtn) {
                 filterBtn.addEventListener('click', filterData);
             }
 
-            // Thêm sự kiện cho nút "Mở Cửa Khẩn Cấp"
             const emergencyBtn = document.getElementById('emergencyOpenButton');
             if (emergencyBtn) {
                 emergencyBtn.addEventListener('click', sendEmergencyOpenCommand);
             }
 
-            // Thêm sự kiện cho nút "Thiết lập maxEndDate"
             const setMaxEndDateBtn = document.getElementById('setMaxEndDateButton');
             if (setMaxEndDateBtn) {
                 setMaxEndDateBtn.addEventListener('click', setMaxEndDate);
             }
 
-            // Thêm sự kiện cho nút "Đăng Ký Vân Tay"
             const registerBtn = document.getElementById('registerFingerprintButton');
             if (registerBtn) {
                 registerBtn.addEventListener('click', sendRegisterFingerprintCommand);
+            }
+
+            // Thêm sự kiện cho nút "Hủy Đăng Ký Vân Tay"
+            const cancelBtn = document.getElementById('cancelFingerprintButton');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', sendCancelRegisterCommand);
             }
         });
     </script>
 </head>
 <body>
-    <h1>
+    <h1>cc
         GGGGGG
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
@@ -770,14 +698,10 @@
         </div>
         <div class="data-item" style="width: 100%; text-align: center;">
             <h2>Thời gian</h2>
-            <!-- Xóa phần timestamp không cập nhật -->
-            <!-- <p id="timestamp" class="timestamp">Đang tải...</p> -->
-            <!-- Giữ lại đồng hồ trực tiếp -->
             <p id="liveClock" class="live-clock"></p>
         </div>
     </div>
 
-    <!-- Thanh nhập ngày và nút lọc dữ liệu -->
     <div class="filter-container">
         <label for="startDate">Ngày bắt đầu:</label>
         <input type="text" id="startDate" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}" title="Định dạng: DD/MM/YYYY">
@@ -787,7 +711,6 @@
         <div id="filterMessage" class="filter-message"></div>
     </div>
 
-    <!-- Trường nhập để thiết lập maxEndDate -->
     <div class="filter-container">
         <label for="maxEndDateInput">Ngày kết thúc tối đa:</label>
         <input type="text" id="maxEndDateInput" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}" title="Định dạng: DD/MM/YYYY">
@@ -795,14 +718,14 @@
         <div id="setMaxEndDateMessage" class="filter-message"></div>
     </div>
 
-    <!-- Nút để hiển thị bảng dữ liệu -->
     <button id="toggleButton">Hiển thị danh sách</button>
     <!-- Nút Đăng Ký Vân Tay -->
     <button id="registerFingerprintButton">Đăng Ký Vân Tay</button>
+    <!-- Nút Hủy Đăng Ký Vân Tay (Mới thêm) -->
+    <button id="cancelFingerprintButton">Hủy Đăng Ký Vân Tay</button>
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
 
-    <!-- Bảng dữ liệu -->
     <table id="dataTable">
         <thead>
             <tr>
@@ -812,11 +735,9 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Dữ liệu sẽ được thêm vào đây -->
         </tbody>
     </table>
 
-    <!-- Thanh thông tin chạy -->
     <div class="running-info">
         <div class="running-text">
             📧 Email: your-email@example.com | 📞 Số điện thoại: +84 987 654 321 | 🏠 Địa chỉ: 456 Đường DEF, Quận UVW, Thành phố Hà Nội &nbsp;&nbsp;&nbsp;
