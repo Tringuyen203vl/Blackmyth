@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -531,7 +532,6 @@
             if (!startDate || !endDate) {
                 filterMessage.style.color = 'red';
                 filterMessage.innerText = 'Định dạng ngày không hợp lệ.';
-                document.getElementById('dataTable').style.display = 'none';
                 return;
             }
 
@@ -559,7 +559,7 @@
 
         // Hàm để gửi yêu cầu đăng ký vân tay
         function sendRegisterFingerprintCommand() {
-            const esp32URL = 'http://192.168.1.6/register_fingerprint?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY bằng khóa bí mật của bạn
+            const esp32URL = 'http://192.168.1.6/register_fingerprint';
             // Mở ESP32 endpoint để kích hoạt đăng ký vân tay
             window.location.href = esp32URL;
 
@@ -573,7 +573,7 @@
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
         function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.6/emergency_open?key=YOUR_SECRET_KEY'; // Địa chỉ IP của ESP32 và thêm khóa bảo mật
+            const esp32URL = 'http://192.168.1.6/emergency_open'; // Địa chỉ IP của ESP32
 
             // Mở ESP32 endpoint để kích hoạt mở cửa
             window.location.href = esp32URL;
@@ -742,8 +742,8 @@
     </script>
 </head>
 <body>
-    <h1>
-        GGGGGG
+    <h1>ff
+        ktyqqq
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
