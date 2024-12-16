@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -532,6 +531,7 @@
             if (!startDate || !endDate) {
                 filterMessage.style.color = 'red';
                 filterMessage.innerText = 'Định dạng ngày không hợp lệ.';
+                document.getElementById('dataTable').style.display = 'none';
                 return;
             }
 
@@ -559,7 +559,7 @@
 
         // Hàm để gửi yêu cầu đăng ký vân tay
         function sendRegisterFingerprintCommand() {
-            const esp32URL = 'http://192.168.1.6/register_fingerprint';
+            const esp32URL = 'http://192.168.1.6/register_fingerprint?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY bằng khóa bí mật của bạn
             // Mở ESP32 endpoint để kích hoạt đăng ký vân tay
             window.location.href = esp32URL;
 
@@ -573,7 +573,7 @@
 
         // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
         function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.6/emergency_open'; // Địa chỉ IP của ESP32
+            const esp32URL = 'http://192.168.1.6/emergency_open?key=YOUR_SECRET_KEY'; // Địa chỉ IP của ESP32 và thêm khóa bảo mật
 
             // Mở ESP32 endpoint để kích hoạt mở cửa
             window.location.href = esp32URL;
@@ -582,6 +582,19 @@
             setTimeout(function() {
                 window.location.href = 'dashboard.html'; // Thay bằng URL chính xác của dashboard nếu khác
             }, 1000); // 1000 milliseconds = 1 giây
+             }
+
+        // Hàm để gửi lệnh mở cửa khẩn cấp lên ESP32 Web Server bằng cách chuyển hướng trình duyệt
+        function sendEmergencyOpenCommand() {
+            const esp32URL = 'http://192.168.1.6/emergency_open?key=YOUR_SECRET_KEY'; // Địa chỉ IP của ESP32 và thêm khóa bảo mật
+
+            // Mở ESP32 endpoint để kích hoạt mở cửa
+            window.location.href = esp32URL;
+
+            // Sau 1 giây, quay lại dashboard.html
+            setTimeout(function() {
+                window.location.href = 'dashboard.html'; // Thay bằng URL chính xác của dashboard nếu khác
+            }, 1000); // 1000 millise
         }
 
         // Hàm để thiết lập maxEndDate từ input của người dùng
@@ -742,8 +755,8 @@
     </script>
 </head>
 <body>
-    <h1>ff
-        ktyqqq
+    <h1>
+        GGGGGG
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
