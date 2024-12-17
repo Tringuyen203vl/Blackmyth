@@ -105,6 +105,23 @@
             background-color: #e6c200;
         }
 
+        /* Nút Xóa Vân Tay */
+        #deleteFingerprintButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #FF5722; /* Màu cam đậm để biểu thị xóa */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #deleteFingerprintButton:hover {
+            background-color: #e64a19;
+        }
+
         .data-container {
             display: flex;
             flex-wrap: wrap;
@@ -554,23 +571,37 @@
 
         // Hàm gửi lệnh đăng ký vân tay
         function sendRegisterFingerprintCommand() {
-            const esp32URL = 'http://192.168.1.6/register_fingerprint?key=YOUR_SECRET_KEY';
+            const esp32URL = 'http://192.168.1.5/register_fingerprint?key=YOUR_SECRET_KEY';
             window.location.href = esp32URL;
         }
 
         // Hàm gửi lệnh hủy đăng ký vân tay
         function sendCancelRegisterCommand() {
-            const esp32URL = 'http://192.168.1.6/cancel_register?key=YOUR_SECRET_KEY';
+            const esp32URL = 'http://192.168.1.5/cancel_register?key=YOUR_SECRET_KEY';
             window.location.href = esp32URL;
         }
 
         // Hàm gửi lệnh mở cửa khẩn cấp
         function sendEmergencyOpenCommand() {
-            const esp32URL = 'http://192.168.1.6/emergency_open?key=YOUR_SECRET_KEY';
+            const esp32URL = 'http://192.168.1.5/emergency_open?key=YOUR_SECRET_KEY';
             window.location.href = esp32URL;
             setTimeout(function() {
                 window.location.href = 'dashboard.html';
             }, 1000);
+        }
+
+        // Hàm gửi lệnh xóa vân tay
+        function sendDeleteFingerprintCommand() {
+            const esp32URL = 'http://192.168.1.5/delete_fingerprint?key=VG8Y7EE81T7ATTOD'; // Thay địa chỉ IP và key bảo mật của bạn
+            fetch(esp32URL)
+                .then(response => response.text())
+                .then(data => {
+                    alert(data); // Hiển thị thông báo từ ESP32
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gửi yêu cầu xóa vân tay:', error);
+                    alert('Lỗi khi gửi yêu cầu xóa vân tay.');
+                });
         }
 
         // Hàm để thiết lập maxEndDate từ input người dùng
@@ -710,12 +741,17 @@
             if (cancelRegisterBtn) {
                 cancelRegisterBtn.addEventListener('click', sendCancelRegisterCommand);
             }
+
+            const deleteFingerprintBtn = document.getElementById('deleteFingerprintButton');
+            if (deleteFingerprintBtn) {
+                deleteFingerprintBtn.addEventListener('click', sendDeleteFingerprintCommand);
+            }
         });
     </script>
 </head>
 <body>
     <h1>
-        huhu
+        hik
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
@@ -753,6 +789,9 @@
     <!-- Nút Đăng Ký Vân Tay -->
     <button id="registerFingerprintButton">Đăng Ký Vân Tay</button>
     <!-- Nút Hủy Đăng Ký Vân Tay (Màu vàng) -->
+    <button id="cancelRegisterButton">Hủy Đăng Ký</button>
+    <!-- Nút Xóa Vân Tay -->
+    <button id="deleteFingerprintButton">Xóa Vân Tay</button>
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
 
