@@ -11,20 +11,19 @@
             box-sizing: border-box;
         }
 
-       body {
+        /* Body với nền hình ảnh (thay link ảnh thực tế bên dưới) */
+        body {
             font-family: 'Arial', sans-serif;
-            background-image: url('https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif'); /* Thay bằng liên kết hình nền của bạn */
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-color: rgba(244, 246, 248, 0.8); /* Màu nền phụ nếu hình ảnh không tải được */
+            /* Thay link hình nền dưới đây bằng ảnh bạn mong muốn */
+            background: url("https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif") no-repeat center center fixed;
+            background-size: cover; 
+            color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Chỉnh sửa để không căn giữa hoàn toàn */
             min-height: 100vh;
             padding: 20px;
-            position: relative; /* Để chứa thanh thông tin chạy */
+            position: relative;
         }
 
         /* Tiêu đề, chứa logout button */
@@ -582,8 +581,6 @@
 
             // Khi blur, nếu người dùng không nhập đủ => có thể giữ nguyên mask hoặc xóa
             input.addEventListener('blur', () => {
-                // Kiểm tra xem người dùng đã thay đổi gì chưa
-                // Ở đây, nếu chuỗi vẫn là mask, có thể để nguyên hoặc clear:
                 if (input.value.toLowerCase() === mask) {
                     // input.value = '';  // Nếu muốn clear hẳn
                     input.value = mask;   // Hoặc cứ giữ mask cũng được
@@ -593,8 +590,7 @@
             // Bắt sự kiện input, tự động format chuỗi đã nhập sao cho vẫn nằm trong mask
             input.addEventListener('input', (e) => {
                 let value = input.value;
-                // Nếu người dùng xóa hoặc gõ lung tung => thay về mask
-                // Hoặc ta chỉ lọc ra ký tự số
+                // Lọc ra ký tự số
                 let onlyDigits = value.replace(/\D/g, '');
 
                 // Cắt chỉ lấy tối đa 8 chữ số (ngày 2, tháng 2, năm 4)
@@ -602,7 +598,7 @@
                     onlyDigits = onlyDigits.slice(0, 8);
                 }
 
-                // Tạo một mảng ký tự mask
+                // Tạo một mảng ký tự từ mask
                 let result = mask.split('');
                 let digitIndex = 0;
 
@@ -611,26 +607,17 @@
                         if (digitIndex < onlyDigits.length) {
                             result[i] = onlyDigits[digitIndex];
                             digitIndex++;
-                        } else {
-                            // Nếu chưa có đủ digit, thay thế bằng kí tự placeholder (d/m/y) hoặc dấu gạch dưới
-                            // Ở đây mình giữ nguyên chữ 'd', 'm', 'y' cho trực quan
-                            // Nếu muốn gạch dưới, dùng '_'
-                            // result[i] = '_';
                         }
                     }
                 }
                 input.value = result.join('');
                 
-                // Di chuyển con trỏ cho phù hợp (đưa con trỏ tới vị trí ngay sau ký tự vừa nhập).
-                // Lấy vị trí đầu tiên trong mask còn là 'd','m','y'
+                // Xác định vị trí con trỏ sau khi nhập
                 let nextPos = result.findIndex(ch => ch === 'd' || ch === 'm' || ch === 'y');
-                if (nextPos === -1) {
-                    nextPos = result.length; 
-                }
-                // Tìm offset dựa trên digitIndex (đã thay thế được digitIndex ký tự)
-                // digitIndex chính là số ký tự hợp lệ đã gõ
+                if (nextPos === -1) nextPos = result.length;
+                
                 if (digitIndex < 8) {
-                    // Tìm vị trí digitIndex-th trong mask (những chỗ 'd','m','y')
+                    // Tìm vị trí digitIndex-th trong mask
                     let tempCount = digitIndex;
                     let iPos = 0;
                     for (let i = 0; i < result.length; i++) {
@@ -645,26 +632,24 @@
                     }
                     input.setSelectionRange(iPos+1, iPos+1);
                 } else {
-                    // Nếu gõ đủ 8 ký tự ngày tháng năm, con trỏ nhảy đến cuối
+                    // Nếu gõ đủ 8 ký tự, con trỏ nhảy về cuối
                     input.setSelectionRange(result.length, result.length);
                 }
             });
 
-            // Hỗ trợ phím Backspace: xóa 1 ký tự số => thay bằng 'd'/'m'/'y'
+            // Hỗ trợ phím Backspace
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace') {
-                    e.preventDefault(); // Chặn hành vi mặc định
+                    e.preventDefault();
                     let pos = input.selectionStart; 
-                    // Lùi lại 1 vị trí, thay nó bằng ký tự mask, rồi setSelectionRange
                     if (pos > 0) {
-                        // Tạo mảng từ value hiện tại
                         let arr = input.value.split('');
-                        // Lùi về 1 ký tự, nếu ký tự đó là '/', hãy lùi tiếp
+                        // Lùi về 1 ký tự, nếu là '/', thì lùi tiếp 1
                         let newPos = pos - 1;
                         if (arr[newPos] === '/') {
                             newPos = newPos - 1 >= 0 ? newPos - 1 : 0;
                         }
-                        // Thay vị trí đó bằng đúng ký tự mask gốc
+                        // Thay vị trí đó bằng ký tự mask gốc
                         arr[newPos] = mask[newPos];
                         input.value = arr.join('');
                         input.setSelectionRange(newPos, newPos);
@@ -704,7 +689,7 @@
 </head>
 <body>
     <h1>
-        Trang điều khiển 
+        Dashboard22
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
 
