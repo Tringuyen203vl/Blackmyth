@@ -156,7 +156,7 @@
         /* Nút Hiển thị danh sách */
         #toggleButton {
             margin: 20px 10px 10px;
-            background-color:  #4CAF50; /* Deep Purple */
+            background-color:  #4CAF50; /* Màu xanh lá */
         }
         #toggleButton:hover {
             background-color: #5E35B1;
@@ -165,7 +165,7 @@
         /* Nút Đăng Ký Vân Tay */
         #registerFingerprintButton {
             margin: 10px;
-            background-color:#673AB7; /* Green */
+            background-color:#673AB7; /* Màu tím */
         }
         #registerFingerprintButton:hover {
             background-color: #43A047;
@@ -174,7 +174,7 @@
         /* Nút Mở Khẩn Cấp */
         #emergencyOpenButton {
             margin: 10px;
-            background-color: #F44336; /* Red */
+            background-color: #F44336; /* Màu đỏ */
         }
         #emergencyOpenButton:hover {
             background-color: #D32F2F;
@@ -183,7 +183,7 @@
         /* Nút Xóa Vân Tay */
         #deleteFingerprintButton {
             margin: 10px;
-            background-color: #FF9800; /* Orange */
+            background-color: #FF9800; /* Màu cam */
         }
         #deleteFingerprintButton:hover {
             background-color: #FB8C00;
@@ -205,6 +205,15 @@
         }
         #setMaxEndDateButton:hover {
             background-color: #0b7dda;
+        }
+
+        /* Nút Xem ThingSpeak */
+        #viewThingSpeakButton {
+            margin: 10px;
+            background: linear-gradient(to right, #2196F3, #21CBF3); /* Gradient xanh dương */
+        }
+        #viewThingSpeakButton:hover {
+            background: linear-gradient(to right, #0b7dda, #1E90FF);
         }
 
         /* Bảng */
@@ -684,6 +693,11 @@
             document.getElementById('registerFingerprintButton').addEventListener('click', sendRegisterFingerprintCommand);
             document.getElementById('cancelRegisterButton')?.addEventListener('click', sendCancelRegisterCommand);
             document.getElementById('deleteFingerprintButton').addEventListener('click', sendDeleteFingerprintCommand);
+            
+            // Gán event cho nút Xem ThingSpeak
+            document.getElementById('viewThingSpeakButton').addEventListener('click', function() {
+                window.open('https://thingspeak.mathworks.com/channels/2783657', '_blank');
+            });
         });
     </script>
 </head>
@@ -730,6 +744,7 @@
         <button id="registerFingerprintButton">Đăng Ký Vân Tay</button>
         <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
         <button id="deleteFingerprintButton">Xóa Vân Tay</button>
+        <button id="viewThingSpeakButton">Xem trên ThingSpeak</button> <!-- Nút mới thêm vào -->
     </div>
 
     <table id="dataTable">
