@@ -11,7 +11,7 @@
             box-sizing: border-box;
         }
 
-        /* Body với nền hình ảnh (thay link ảnh thực tế bên dưới) */
+        /* Body với nền hình ảnh */
         body {
             font-family: 'Arial', sans-serif;
             background: url("https://cdn.pixabay.com/animation/2023/06/06/06/51/06-51-32-766_512.gif") no-repeat center center fixed;
@@ -38,7 +38,7 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        /* Thanh logout */
+        /* Nút Logout */
         #logoutButton {
             padding: 8px 16px;
             font-size: 1em;
@@ -65,9 +65,8 @@
             margin-bottom: 20px;
         }
 
-        /* Thẻ Data Item: hiển thị field1, field2, đồng hồ */
+        /* Thẻ Data Item (cơ bản) */
         .data-item {
-            background-color: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(6px);
             border: 2px solid #fff;
             border-radius: 10px;
@@ -80,7 +79,6 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 12px rgba(0,0,0,0.2);
         }
-
         .data-item h2 {
             font-size: 1.2em;
             color: #2c3e50;
@@ -91,7 +89,20 @@
             color: #555;
         }
 
-        /* Đồng hồ hiển thị to, rõ */
+        /* 3 khung với 3 màu nền khác nhau */
+        .data-container .data-item:nth-child(1) {
+            background: linear-gradient(to bottom right, #FDE68A, #FCD34D); /* Khung ESP ID: pastel vàng */
+        }
+        .data-container .data-item:nth-child(2) {
+            background: linear-gradient(to bottom right, #A7F3D0, #6EE7B7); /* Khung Fingerprint ID: pastel xanh */
+        }
+        .data-container .data-item:nth-child(3) {
+            background: linear-gradient(to bottom right, #C7D2FE, #A5B4FC); /* Khung Thời gian: pastel tím */
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Đồng hồ hiển thị */
         .live-clock {
             margin-top: 10px;
             font-size: 1.2em;
@@ -142,7 +153,7 @@
             transform: scale(1.05);
         }
 
-        /* Nút hiển thị danh sách */
+        /* Nút Hiển thị danh sách */
         #toggleButton {
             margin: 20px 10px 10px;
             background-color: #673AB7; /* Deep Purple */
@@ -151,7 +162,7 @@
             background-color: #5E35B1;
         }
 
-        /* Nút đăng ký vân tay */
+        /* Nút Đăng Ký Vân Tay */
         #registerFingerprintButton {
             margin: 10px;
             background-color: #4CAF50; /* Green */
@@ -160,7 +171,7 @@
             background-color: #43A047;
         }
 
-        /* Nút mở khẩn cấp */
+        /* Nút Mở Khẩn Cấp */
         #emergencyOpenButton {
             margin: 10px;
             background-color: #F44336; /* Red */
@@ -169,7 +180,7 @@
             background-color: #D32F2F;
         }
 
-        /* Nút xóa vân tay */
+        /* Nút Xóa Vân Tay */
         #deleteFingerprintButton {
             margin: 10px;
             background-color: #FF9800; /* Orange */
@@ -569,41 +580,30 @@
             setInterval(updateClock, 1000);
         }
 
-        // Hàm autoFormatDate: khi người dùng nhập hoặc sửa ngày tháng năm, 
-        // luôn giữ format "dd/mm/yyyy" và có thể thay thế từng ký tự.
+        // Giữ format "dd/mm/yyyy" khi nhập ngày
         function autoFormatDate(input) {
-            // Mask cố định
             const mask = 'dd/mm/yyyy';
 
-            // Khi focus, nếu value đang rỗng hoặc đã là mask thì hiển thị mask
             input.addEventListener('focus', () => {
                 if (input.value.trim() === '' || input.value.trim().toLowerCase() === mask) {
                     input.value = mask;
-                    // Đưa con trỏ về trước ký tự 'd' đầu tiên
                     input.setSelectionRange(0,0);
                 }
             });
 
-            // Khi blur, nếu người dùng không nhập đủ => có thể giữ nguyên mask hoặc xóa
             input.addEventListener('blur', () => {
                 if (input.value.toLowerCase() === mask) {
-                    // input.value = '';  // Nếu muốn clear hẳn
-                    input.value = mask;   // Hoặc cứ giữ mask cũng được
+                    input.value = mask; 
                 }
             });
 
-            // Bắt sự kiện input, tự động format chuỗi đã nhập sao cho vẫn nằm trong mask
             input.addEventListener('input', (e) => {
                 let value = input.value;
-                // Lọc ra ký tự số
                 let onlyDigits = value.replace(/\D/g, '');
-
-                // Cắt chỉ lấy tối đa 8 chữ số (ngày 2, tháng 2, năm 4)
                 if (onlyDigits.length > 8) {
                     onlyDigits = onlyDigits.slice(0, 8);
                 }
 
-                // Tạo một mảng ký tự từ mask
                 let result = mask.split('');
                 let digitIndex = 0;
 
@@ -617,12 +617,10 @@
                 }
                 input.value = result.join('');
                 
-                // Xác định vị trí con trỏ sau khi nhập
                 let nextPos = result.findIndex(ch => ch === 'd' || ch === 'm' || ch === 'y');
                 if (nextPos === -1) nextPos = result.length;
                 
                 if (digitIndex < 8) {
-                    // Tìm vị trí digitIndex-th trong mask
                     let tempCount = digitIndex;
                     let iPos = 0;
                     for (let i = 0; i < result.length; i++) {
@@ -637,24 +635,20 @@
                     }
                     input.setSelectionRange(iPos+1, iPos+1);
                 } else {
-                    // Nếu gõ đủ 8 ký tự, con trỏ nhảy về cuối
                     input.setSelectionRange(result.length, result.length);
                 }
             });
 
-            // Hỗ trợ phím Backspace
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace') {
                     e.preventDefault();
                     let pos = input.selectionStart; 
                     if (pos > 0) {
                         let arr = input.value.split('');
-                        // Lùi về 1 ký tự, nếu là '/', thì lùi tiếp 1
                         let newPos = pos - 1;
                         if (arr[newPos] === '/') {
                             newPos = newPos - 1 >= 0 ? newPos - 1 : 0;
                         }
-                        // Thay vị trí đó bằng ký tự mask gốc
                         arr[newPos] = mask[newPos];
                         input.value = arr.join('');
                         input.setSelectionRange(newPos, newPos);
@@ -664,10 +658,11 @@
         }
 
         window.addEventListener('load', function() {
+            // Giới hạn endDate ban đầu
             const endDateInputElement = document.getElementById('endDate');
             endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]);
 
-            // Áp dụng autoFormatDate cho 3 ô input ngày
+            // Gắn autoFormatDate cho 3 ô
             const dateInputs = ['startDate', 'endDate', 'maxEndDateInput'];
             dateInputs.forEach(id => {
                 const input = document.getElementById(id);
@@ -707,7 +702,7 @@
             <h2>Fingerprint ID</h2>
             <p id="field2">Đang tải...</p>
         </div>
-        <div class="data-item" style="width: 100%; text-align: center;">
+        <div class="data-item">
             <h2>Thời gian</h2>
             <p id="liveClock" class="live-clock"></p>
         </div>
