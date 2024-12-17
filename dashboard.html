@@ -105,7 +105,7 @@
             background-color: #e6c200;
         }
 
-        /* Nút Xóa Vân Tay (Thêm Mới) */
+        /* Nút Xóa Vân Tay */
         #deleteFingerprintButton {
             margin-top: 10px;
             padding: 10px 20px;
@@ -572,28 +572,58 @@
         // Hàm gửi lệnh đăng ký vân tay
         function sendRegisterFingerprintCommand() {
             const esp32URL = 'http://192.168.1.5/register_fingerprint?key=YOUR_SECRET_KEY';
-            window.location.href = esp32URL;
+            fetch(esp32URL)
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Lỗi khi gửi yêu cầu đăng ký vân tay.');
+                });
         }
 
         // Hàm gửi lệnh hủy đăng ký vân tay
         function sendCancelRegisterCommand() {
             const esp32URL = 'http://192.168.1.5/cancel_register?key=YOUR_SECRET_KEY';
-            window.location.href = esp32URL;
+            fetch(esp32URL)
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Lỗi khi gửi yêu cầu hủy đăng ký vân tay.');
+                });
         }
 
         // Hàm gửi lệnh mở cửa khẩn cấp
         function sendEmergencyOpenCommand() {
             const esp32URL = 'http://192.168.1.5/emergency_open?key=YOUR_SECRET_KEY';
-            window.location.href = esp32URL;
-            setTimeout(function() {
-                window.location.href = 'dashboard.html';
-            }, 1000);
+            fetch(esp32URL)
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    // Có thể thêm logic sau khi mở cửa nếu cần
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Lỗi khi gửi yêu cầu mở cửa khẩn cấp.');
+                });
         }
 
         // Hàm gửi lệnh xóa vân tay
         function sendDeleteFingerprintCommand() {
             const esp32URL = 'http://192.168.1.5/delete_fingerprint?key=YOUR_SECRET_KEY';
-            window.location.href = esp32URL;
+            fetch(esp32URL)
+                .then(response => response.text())
+                .then(data => {
+                    alert(data); // Hiển thị phản hồi từ ESP32
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Lỗi khi gửi yêu cầu xóa vân tay.');
+                });
         }
 
         // Hàm để thiết lập maxEndDate từ input người dùng
@@ -734,7 +764,6 @@
                 cancelRegisterBtn.addEventListener('click', sendCancelRegisterCommand);
             }
 
-            // ------------------ Thêm Event Listener cho Nút Xóa Vân Tay ------------------
             const deleteFingerprintBtn = document.getElementById('deleteFingerprintButton');
             if (deleteFingerprintBtn) {
                 deleteFingerprintBtn.addEventListener('click', sendDeleteFingerprintCommand);
@@ -744,7 +773,7 @@
 </head>
 <body>
     <h1>
-        huhu115
+        huhu
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
@@ -785,7 +814,7 @@
     <button id="cancelRegisterButton">Hủy Đăng Ký Vân Tay</button>
     <!-- Nút Mở Cửa Khẩn Cấp -->
     <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
-    <!-- Nút Xóa Vân Tay (Thêm Mới) -->
+    <!-- Nút Xóa Vân Tay -->
     <button id="deleteFingerprintButton">Xóa Vân Tay</button>
 
     <table id="dataTable">
