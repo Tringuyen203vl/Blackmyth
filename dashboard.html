@@ -118,6 +118,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             width: 150px;
+            text-transform: uppercase; /* Giúp chữ "DD/MM/YYYY" nổi bật */
         }
         .filter-message {
             width: 100%;
@@ -258,6 +259,7 @@
         }
 
         function parseDate(str) {
+            // parseDate chỉ phân tích DD/MM/YYYY (phần HH:MM:SS không xử lý trong hàm này)
             const parts = str.split('/');
             if (parts.length !== 3) return null;
             const day = parseInt(parts[0], 10);
@@ -277,7 +279,7 @@
 
         function addRowToTable(field1, field2, timestamp, insertAtTop = false) {
             const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow(insertAtTop ? 0 : -1);
+            const newRow = insertAtTop ? table.insertRow(0) : table.insertRow(-1);
 
             const cell1 = newRow.insertCell(0);
             const cell2 = newRow.insertCell(1);
@@ -337,6 +339,7 @@
                 let feeds = data.feeds;
                 if (feeds.length === 0) return;
 
+                // Đảo ngược mảng cho bản ghi mới nằm ở trên
                 feeds = feeds.reverse();
 
                 const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
@@ -397,6 +400,7 @@
                     document.getElementById('filterMessage').innerText = '';
                 }
 
+                // Lọc theo maxEndDate
                 const maxAllowedDate = parseDate(maxEndDate.split(' ')[0]);
                 feeds = feeds.filter(feed => {
                     if (feed.created_at) {
@@ -558,31 +562,109 @@
             setInterval(updateClock, 1000);
         }
 
+        // Hàm autoFormatDate: khi người dùng nhập hoặc sửa ngày tháng năm, 
+        // luôn giữ format "dd/mm/yyyy" và có thể thay thế từng ký tự.
         function autoFormatDate(input) {
-            input.addEventListener('input', function() {
-                let value = input.value.replace(/\D/g, '');
-                if (value.length > 8) {
-                    value = value.slice(0, 8);
+            // Mask cố định
+            const mask = 'dd/mm/yyyy';
+
+            // Khi focus, nếu value đang rỗng hoặc đã là mask thì hiển thị mask
+            input.addEventListener('focus', () => {
+                if (input.value.trim() === '' || input.value.trim().toLowerCase() === mask) {
+                    input.value = mask;
+                    // Đưa con trỏ về trước ký tự 'd' đầu tiên
+                    input.setSelectionRange(0,0);
                 }
-                let formattedValue = '';
-                if (value.length > 0) {
-                    formattedValue += value.slice(0,2);
-                }
-                if (value.length >= 3) {
-                    formattedValue += '/' + value.slice(2,4);
-                }
-                if (value.length >=5) {
-                    formattedValue += '/' + value.slice(4,8);
-                }
-                input.value = formattedValue;
             });
 
-            input.addEventListener('keydown', function(e) {
+            // Khi blur, nếu người dùng không nhập đủ => có thể giữ nguyên mask hoặc xóa
+            input.addEventListener('blur', () => {
+                // Kiểm tra xem người dùng đã thay đổi gì chưa
+                // Ở đây, nếu chuỗi vẫn là mask, có thể để nguyên hoặc clear:
+                if (input.value.toLowerCase() === mask) {
+                    // input.value = '';  // Nếu muốn clear hẳn
+                    input.value = mask;   // Hoặc cứ giữ mask cũng được
+                }
+            });
+
+            // Bắt sự kiện input, tự động format chuỗi đã nhập sao cho vẫn nằm trong mask
+            input.addEventListener('input', (e) => {
+                let value = input.value;
+                // Nếu người dùng xóa hoặc gõ lung tung => thay về mask
+                // Hoặc ta chỉ lọc ra ký tự số
+                let onlyDigits = value.replace(/\D/g, '');
+
+                // Cắt chỉ lấy tối đa 8 chữ số (ngày 2, tháng 2, năm 4)
+                if (onlyDigits.length > 8) {
+                    onlyDigits = onlyDigits.slice(0, 8);
+                }
+
+                // Tạo một mảng ký tự mask
+                let result = mask.split('');
+                let digitIndex = 0;
+
+                for (let i = 0; i < result.length; i++) {
+                    if (result[i] === 'd' || result[i] === 'm' || result[i] === 'y') {
+                        if (digitIndex < onlyDigits.length) {
+                            result[i] = onlyDigits[digitIndex];
+                            digitIndex++;
+                        } else {
+                            // Nếu chưa có đủ digit, thay thế bằng kí tự placeholder (d/m/y) hoặc dấu gạch dưới
+                            // Ở đây mình giữ nguyên chữ 'd', 'm', 'y' cho trực quan
+                            // Nếu muốn gạch dưới, dùng '_'
+                            // result[i] = '_';
+                        }
+                    }
+                }
+                input.value = result.join('');
+                
+                // Di chuyển con trỏ cho phù hợp (đưa con trỏ tới vị trí ngay sau ký tự vừa nhập).
+                // Lấy vị trí đầu tiên trong mask còn là 'd','m','y'
+                let nextPos = result.findIndex(ch => ch === 'd' || ch === 'm' || ch === 'y');
+                if (nextPos === -1) {
+                    nextPos = result.length; 
+                }
+                // Tìm offset dựa trên digitIndex (đã thay thế được digitIndex ký tự)
+                // digitIndex chính là số ký tự hợp lệ đã gõ
+                if (digitIndex < 8) {
+                    // Tìm vị trí digitIndex-th trong mask (những chỗ 'd','m','y')
+                    let tempCount = digitIndex;
+                    let iPos = 0;
+                    for (let i = 0; i < result.length; i++) {
+                        if (['d','m','y'].includes(mask[i])) {
+                            if (tempCount === 0) {
+                                iPos = i;
+                                break;
+                            }
+                            tempCount--;
+                            iPos = i;
+                        }
+                    }
+                    input.setSelectionRange(iPos+1, iPos+1);
+                } else {
+                    // Nếu gõ đủ 8 ký tự ngày tháng năm, con trỏ nhảy đến cuối
+                    input.setSelectionRange(result.length, result.length);
+                }
+            });
+
+            // Hỗ trợ phím Backspace: xóa 1 ký tự số => thay bằng 'd'/'m'/'y'
+            input.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace') {
-                    const value = input.value;
-                    if (value.endsWith('/')) {
-                        e.preventDefault();
-                        input.value = value.slice(0, -1);
+                    e.preventDefault(); // Chặn hành vi mặc định
+                    let pos = input.selectionStart; 
+                    // Lùi lại 1 vị trí, thay nó bằng ký tự mask, rồi setSelectionRange
+                    if (pos > 0) {
+                        // Tạo mảng từ value hiện tại
+                        let arr = input.value.split('');
+                        // Lùi về 1 ký tự, nếu ký tự đó là '/', hãy lùi tiếp
+                        let newPos = pos - 1;
+                        if (arr[newPos] === '/') {
+                            newPos = newPos - 1 >= 0 ? newPos - 1 : 0;
+                        }
+                        // Thay vị trí đó bằng đúng ký tự mask gốc
+                        arr[newPos] = mask[newPos];
+                        input.value = arr.join('');
+                        input.setSelectionRange(newPos, newPos);
                     }
                 }
             });
@@ -592,6 +674,7 @@
             const endDateInputElement = document.getElementById('endDate');
             endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]);
 
+            // Áp dụng autoFormatDate cho 3 ô input ngày
             const dateInputs = ['startDate', 'endDate', 'maxEndDateInput'];
             dateInputs.forEach(id => {
                 const input = document.getElementById(id);
@@ -604,6 +687,7 @@
             startAutoUpdate();
             startLiveClock();
 
+            // Gán event cho các nút
             document.getElementById('logoutButton').addEventListener('click', logout);
             document.getElementById('toggleButton').addEventListener('click', toggleTable);
             document.getElementById('filterButton').addEventListener('click', filterData);
@@ -617,7 +701,7 @@
 </head>
 <body>
     <h1>
-        Dashboard
+        Dashboard 1234567
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
 
@@ -638,16 +722,16 @@
 
     <div class="filter-container">
         <label for="startDate">Ngày bắt đầu:</label>
-        <input type="text" id="startDate" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}" title="Định dạng: DD/MM/YYYY">
+        <input type="text" id="startDate" placeholder="dd/mm/yyyy">
         <label for="endDate">Ngày kết thúc:</label>
-        <input type="text" id="endDate" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}" title="Định dạng: DD/MM/YYYY">
+        <input type="text" id="endDate" placeholder="dd/mm/yyyy">
         <button id="filterButton">Lọc dữ liệu</button>
         <div id="filterMessage" class="filter-message"></div>
     </div>
 
     <div class="filter-container">
         <label for="maxEndDateInput">Ngày kết thúc tối đa:</label>
-        <input type="text" id="maxEndDateInput" placeholder="DD/MM/YYYY" pattern="\d{2}/\d{2}/\d{4}" title="Định dạng: DD/MM/YYYY">
+        <input type="text" id="maxEndDateInput" placeholder="dd/mm/yyyy">
         <button id="setMaxEndDateButton">Thiết lập</button>
         <div id="setMaxEndDateMessage" class="filter-message"></div>
     </div>
