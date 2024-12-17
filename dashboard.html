@@ -571,59 +571,26 @@
 
         // Hàm gửi lệnh đăng ký vân tay
         function sendRegisterFingerprintCommand() {
-            const esp32URL = 'http://192.168.1.5/register_fingerprint?key=YOUR_SECRET_KEY';
-            fetch(esp32URL)
-                .then(response => response.text())
-                .then(data => {
-                    alert(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Lỗi khi gửi yêu cầu đăng ký vân tay.');
-                });
+            const esp32URL = 'http://192.168.1.6/register_fingerprint?key=YOUR_SECRET_KEY';
+            window.location.href = esp32URL;
         }
 
         // Hàm gửi lệnh hủy đăng ký vân tay
         function sendCancelRegisterCommand() {
             const esp32URL = 'http://192.168.1.5/cancel_register?key=YOUR_SECRET_KEY';
-            fetch(esp32URL)
-                .then(response => response.text())
-                .then(data => {
-                    alert(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Lỗi khi gửi yêu cầu hủy đăng ký vân tay.');
-                });
+            window.location.href = esp32URL;
         }
 
         // Hàm gửi lệnh mở cửa khẩn cấp
         function sendEmergencyOpenCommand() {
             const esp32URL = 'http://192.168.1.5/emergency_open?key=YOUR_SECRET_KEY';
-            fetch(esp32URL)
-                .then(response => response.text())
-                .then(data => {
-                    alert(data);
-                    // Có thể thêm logic sau khi mở cửa nếu cần
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Lỗi khi gửi yêu cầu mở cửa khẩn cấp.');
-                });
+            window.location.href = esp32URL;
         }
 
         // Hàm gửi lệnh xóa vân tay
         function sendDeleteFingerprintCommand() {
             const esp32URL = 'http://192.168.1.5/delete_fingerprint?key=YOUR_SECRET_KEY';
-            fetch(esp32URL)
-                .then(response => response.text())
-                .then(data => {
-                    alert(data); // Hiển thị phản hồi từ ESP32
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Lỗi khi gửi yêu cầu xóa vân tay.');
-                });
+            window.location.href = esp32URL;
         }
 
         // Hàm để thiết lập maxEndDate từ input người dùng
@@ -773,7 +740,7 @@
 </head>
 <body>
     <h1>
-        huhu
+        567
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
     <div class="data-container">
