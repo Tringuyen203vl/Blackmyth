@@ -89,7 +89,7 @@
             color: #555;
         }
 
-        /* 3 khung với 3 màu nền khác nhau */
+        /* 4 khung với 4 màu nền khác nhau */
         .data-container .data-item:nth-child(1) {
             background: linear-gradient(to bottom right, #FDE68A, #FCD34D); /* Khung ESP ID: pastel vàng */
         }
@@ -216,13 +216,13 @@
             background: linear-gradient(to right, #F50057, #C51162);
         }
 
-        /* Nút Cập Nhật Danh Sách Vân Tay */
-        #updateFingerprintListButton {
+        /* Nút Hiển thị Vân Tay từ Google Sheets */
+        #syncGoogleSheetButton {
             margin: 10px;
-            background-color: #9C27B0; /* Màu tím đậm */
+            background-color: #3F51B5; /* Màu xanh đậm */
         }
-        #updateFingerprintListButton:hover {
-            background-color: #8E24AA;
+        #syncGoogleSheetButton:hover {
+            background-color: #303F9F;
         }
 
         /* Bảng */
@@ -313,17 +313,19 @@
             window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
         }
 
-        function addRowToTable(field1, field2, timestamp, insertAtTop = false) {
+        function addRowToTable(field1, field2, timestamp, action, insertAtTop = false) {
             const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
             const newRow = insertAtTop ? table.insertRow(0) : table.insertRow(-1);
 
             const cell1 = newRow.insertCell(0);
             const cell2 = newRow.insertCell(1);
             const cell3 = newRow.insertCell(2);
+            const cell4 = newRow.insertCell(3);
 
             cell1.innerText = field1;
             cell2.innerText = field2;
             cell3.innerText = timestamp;
+            cell4.innerText = action;
         }
 
         async function fetchData() {
@@ -350,13 +352,13 @@
                             latestFeed.field1 || 'Không có dữ liệu',
                             latestFeed.field2 || 'Không có dữ liệu',
                             latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu',
+                            'Addition', // Hoặc 'Deletion' tùy thuộc vào trường hợp
                             true
                         );
                         lastEntryID = latestFeed.entry_id;
                     }
                 }
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('field1').innerText = 'Lỗi';
                 document.getElementById('field2').innerText = 'Lỗi';
@@ -388,44 +390,15 @@
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
                         createdAtDate,
-                        false
+                        feed.field4 || 'Addition' // Giả sử field4 chứa hành động
                     );
                     lastEntryID = feed.entry_id;
                 });
 
                 document.getElementById('dataTable').style.display = 'table';
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi tải dữ liệu.';
-                document.getElementById('dataTable').style.display = 'none';
-            }
-        }
-
-        async function fetchFingerprintList() {
-            const GOOGLE_SCRIPT_GET_URL = "https://script.google.com/macros/s/XXXXXXXXXXXX/exec"; // Thay bằng URL Web App GET của bạn
-            try {
-                const response = await fetch(GOOGLE_SCRIPT_GET_URL);
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                const data = await response.json();
-
-                const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-                tableBody.innerHTML = '';
-
-                data.forEach(feed => {
-                    addRowToTable(
-                        feed.ESP_ID || 'Không có dữ liệu',
-                        feed.Fingerprint_ID || 'Không có dữ liệu',
-                        feed.Timestamp ? formatDate(new Date(feed.Timestamp)) : 'Không có dữ liệu',
-                        false
-                    );
-                });
-
-                document.getElementById('dataTable').style.display = 'table';
-            }
-            catch (error) {
-                console.error('Lỗi khi lấy danh sách vân tay:', error);
-                document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi tải danh sách vân tay.';
                 document.getElementById('dataTable').style.display = 'none';
             }
         }
@@ -461,8 +434,7 @@
                     document.getElementById('filterMessage').innerText = 'Dữ liệu không tồn tại.';
                     document.getElementById('dataTable').style.display = 'none';
                     return;
-                }
-                else {
+                } else {
                     document.getElementById('filterMessage').style.color = 'green';
                     document.getElementById('filterMessage').innerText = '';
                 }
@@ -494,14 +466,13 @@
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
                         createdAtDate,
-                        false
+                        feed.field4 || 'Addition' // Giả sử field4 chứa hành động
                     );
                     lastEntryID = feed.entry_id;
                 });
 
                 document.getElementById('dataTable').style.display = 'table';
-            }
-            catch (error) {
+            } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu lịch sử:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi lọc dữ liệu.';
                 document.getElementById('dataTable').style.display = 'none';
@@ -554,8 +525,7 @@
                 document.getElementById('endDate').value = formatDate(maxAllowedDate).split(' ')[0];
                 filterMessage.style.color = 'orange';
                 filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${formatDate(maxAllowedDate).split(' ')[0]}.`;
-            }
-            else {
+            } else {
                 filterMessage.style.color = 'green';
                 filterMessage.innerText = '';
             }
@@ -563,24 +533,20 @@
             await fetchHistoricalData(startDateInput, endDateInput);
         }
 
-        async function updateFingerprintList() {
-            await fetchFingerprintList();
-        }
-
         function sendRegisterFingerprintCommand() {
-            window.location.href = 'http://192.168.1.8/register_fingerprint?key=YOUR_SECRET_KEY';
+            window.location.href = 'http://192.168.1.8/register_fingerprint?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY
         }
 
         function sendCancelRegisterCommand() {
-            window.location.href = 'http://192.168.1.8/cancel_register?key=YOUR_SECRET_KEY';
+            window.location.href = 'http://192.168.1.8/cancel_register?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY
         }
 
         function sendEmergencyOpenCommand() {
-            window.location.href = 'http://192.168.1.8/emergency_open?key=YOUR_SECRET_KEY';
+            window.location.href = 'http://192.168.1.8/emergency_open?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY
         }
 
         function sendDeleteFingerprintCommand() {
-            window.location.href = 'http://192.168.1.8/delete_fingerprint?key=YOUR_SECRET_KEY';
+            window.location.href = 'http://192.168.1.8/delete_fingerprint?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY
         }
 
         function setMaxEndDate() {
@@ -607,11 +573,48 @@
             setMaxEndDateMessage.innerText = `Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate.split(' ')[0]}.`;
         }
 
-        function checkLoginStatus() {
-            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-            if (isLoggedIn !== 'true') {
-                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
+        async function fetchGoogleSheetData() {
+            const url = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Thay YOUR_GOOGLE_APPS_SCRIPT_URL bằng URL Web App của bạn
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                
+                const data = await response.json();
+                populateFingerprintTable(data);
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu từ Google Sheets:', error);
+                alert('Có lỗi xảy ra khi lấy dữ liệu.');
             }
+        }
+
+        function populateFingerprintTable(data) {
+            const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            data.forEach(entry => {
+                const row = tableBody.insertRow();
+
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+                const cell4 = row.insertCell(3);
+
+                cell1.innerText = entry['ESP ID'] || 'Không có dữ liệu';
+                cell2.innerText = entry['Fingerprint ID'] || 'Không có dữ liệu';
+                cell3.innerText = entry['Timestamp'] || 'Không có dữ liệu';
+                cell4.innerText = entry['Action'] || 'Không có dữ liệu';
+            });
+
+            document.getElementById('dataTable').style.display = 'table';
+        }
+
+        function sendDeleteFingerprintFromHTML() {
+            // Hàm này có thể được sử dụng để gửi yêu cầu xóa từ giao diện HTML nếu cần
+        }
+
+        function sendDataToGoogleSheets(action) {
+            // Hàm này có thể được sử dụng để gửi dữ liệu từ giao diện HTML nếu cần
         }
 
         function startAutoUpdate() {
@@ -712,6 +715,13 @@
             });
         }
 
+        function checkLoginStatus() {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                window.location.href = 'https://tringuyen203vl.github.io/Blackmyth/';
+            }
+        }
+
         window.addEventListener('load', function() {
             // Giới hạn endDate ban đầu
             const endDateInputElement = document.getElementById('endDate');
@@ -745,14 +755,14 @@
                 window.open('https://thingspeak.mathworks.com/channels/2783657', '_blank');
             });
 
-            // Gán event cho nút Cập Nhật Danh Sách Vân Tay
-            document.getElementById('updateFingerprintListButton').addEventListener('click', updateFingerprintList);
+            // Gán event cho nút Hiển thị Vân Tay từ Google Sheets
+            document.getElementById('syncGoogleSheetButton').addEventListener('click', fetchGoogleSheetData);
         });
     </script>
 </head>
 <body>
     <h1>
-       Tang điều khiển cửa vân tay 1
+       Tang điều khiển cửa vân tay
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
 
@@ -794,7 +804,7 @@
         <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
         <button id="deleteFingerprintButton">Xóa Vân Tay</button>
         <button id="viewThingSpeakButton">Xem trên ThingSpeak</button>
-        <button id="updateFingerprintListButton">Cập nhật danh sách vân tay</button> <!-- Nút mới -->
+        <button id="syncGoogleSheetButton">Hiển thị Vân Tay từ Google Sheets</button> <!-- Nút mới thêm vào -->
     </div>
 
     <table id="dataTable">
@@ -803,6 +813,7 @@
                 <th>ESP ID</th>
                 <th>Fingerprint ID</th>
                 <th>Thời gian</th>
+                <th>Hành động</th> <!-- Thêm cột Hành động -->
             </tr>
         </thead>
         <tbody>
