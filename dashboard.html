@@ -216,6 +216,15 @@
             background: linear-gradient(to right, #F50057, #C51162);
         }
 
+        /* Nút Cập Nhật Danh Sách Vân Tay */
+        #updateFingerprintListButton {
+            margin: 10px;
+            background-color: #9C27B0; /* Màu tím đậm */
+        }
+        #updateFingerprintListButton:hover {
+            background-color: #8E24AA;
+        }
+
         /* Bảng */
         #dataTable {
             display: none; /* Ẩn bảng ban đầu */
@@ -346,7 +355,8 @@
                         lastEntryID = latestFeed.entry_id;
                     }
                 }
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('field1').innerText = 'Lỗi';
                 document.getElementById('field2').innerText = 'Lỗi';
@@ -384,9 +394,38 @@
                 });
 
                 document.getElementById('dataTable').style.display = 'table';
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi tải dữ liệu.';
+                document.getElementById('dataTable').style.display = 'none';
+            }
+        }
+
+        async function fetchFingerprintList() {
+            const GOOGLE_SCRIPT_GET_URL = "https://script.google.com/macros/s/XXXXXXXXXXXX/exec"; // Thay bằng URL Web App GET của bạn
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_GET_URL);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
+
+                const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+
+                data.forEach(feed => {
+                    addRowToTable(
+                        feed.ESP_ID || 'Không có dữ liệu',
+                        feed.Fingerprint_ID || 'Không có dữ liệu',
+                        feed.Timestamp ? formatDate(new Date(feed.Timestamp)) : 'Không có dữ liệu',
+                        false
+                    );
+                });
+
+                document.getElementById('dataTable').style.display = 'table';
+            }
+            catch (error) {
+                console.error('Lỗi khi lấy danh sách vân tay:', error);
+                document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi tải danh sách vân tay.';
                 document.getElementById('dataTable').style.display = 'none';
             }
         }
@@ -422,7 +461,8 @@
                     document.getElementById('filterMessage').innerText = 'Dữ liệu không tồn tại.';
                     document.getElementById('dataTable').style.display = 'none';
                     return;
-                } else {
+                }
+                else {
                     document.getElementById('filterMessage').style.color = 'green';
                     document.getElementById('filterMessage').innerText = '';
                 }
@@ -460,7 +500,8 @@
                 });
 
                 document.getElementById('dataTable').style.display = 'table';
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi lấy dữ liệu lịch sử:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi lọc dữ liệu.';
                 document.getElementById('dataTable').style.display = 'none';
@@ -513,7 +554,8 @@
                 document.getElementById('endDate').value = formatDate(maxAllowedDate).split(' ')[0];
                 filterMessage.style.color = 'orange';
                 filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${formatDate(maxAllowedDate).split(' ')[0]}.`;
-            } else {
+            }
+            else {
                 filterMessage.style.color = 'green';
                 filterMessage.innerText = '';
             }
@@ -521,20 +563,24 @@
             await fetchHistoricalData(startDateInput, endDateInput);
         }
 
+        async function updateFingerprintList() {
+            await fetchFingerprintList();
+        }
+
         function sendRegisterFingerprintCommand() {
-            window.location.href = 'http://192.168.1.5/register_fingerprint?key=YOUR_SECRET_KEY';
+            window.location.href = 'http://192.168.1.8/register_fingerprint?key=YOUR_SECRET_KEY';
         }
 
         function sendCancelRegisterCommand() {
-            window.location.href = 'http://192.168.1.5/cancel_register?key=YOUR_SECRET_KEY';
+            window.location.href = 'http://192.168.1.8/cancel_register?key=YOUR_SECRET_KEY';
         }
 
         function sendEmergencyOpenCommand() {
-            window.location.href = 'http://192.168.1.5/emergency_open?key=YOUR_SECRET_KEY';
+            window.location.href = 'http://192.168.1.8/emergency_open?key=YOUR_SECRET_KEY';
         }
 
         function sendDeleteFingerprintCommand() {
-            window.location.href = 'http://192.168.1.5/delete_fingerprint?key=YOUR_SECRET_KEY';
+            window.location.href = 'http://192.168.1.8/delete_fingerprint?key=YOUR_SECRET_KEY';
         }
 
         function setMaxEndDate() {
@@ -698,12 +744,15 @@
             document.getElementById('viewThingSpeakButton').addEventListener('click', function() {
                 window.open('https://thingspeak.mathworks.com/channels/2783657', '_blank');
             });
+
+            // Gán event cho nút Cập Nhật Danh Sách Vân Tay
+            document.getElementById('updateFingerprintListButton').addEventListener('click', updateFingerprintList);
         });
     </script>
 </head>
 <body>
     <h1>
-       Tang điều khiển cửa vân tay
+       Tang điều khiển cửa vân tay 1
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
 
@@ -744,7 +793,8 @@
         <button id="registerFingerprintButton">Đăng Ký Vân Tay</button>
         <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
         <button id="deleteFingerprintButton">Xóa Vân Tay</button>
-        <button id="viewThingSpeakButton">Xem trên ThingSpeak</button> <!-- Nút mới thêm vào -->
+        <button id="viewThingSpeakButton">Xem trên ThingSpeak</button>
+        <button id="updateFingerprintListButton">Cập nhật danh sách vân tay</button> <!-- Nút mới -->
     </div>
 
     <table id="dataTable">
@@ -762,8 +812,9 @@
 
     <div class="running-info">
         <div class="running-text">
-            📧 Email: KamenRiderKiVa@gmail.com | 📞 SĐT: +84 987 654 321 | 🏠 Địa chỉ: Khu phố 6, Phường Linh Trung, TP. Thủ Đức, TP. Hồ Chí Minh
-
+            📧 Email: your-email@example.com | 📞 SĐT: +84 987 654 321 | 🏠 Địa chỉ: 456 Đường DEF, Quận UVW, Hà Nội &nbsp;&nbsp;&nbsp;
+            📧 Email: your-email@example.com | 📞 SĐT: +84 987 654 321 | 🏠 Địa chỉ: 456 Đường DEF, Quận UVW, Hà Nội
+        </div>
     </div>
 </body>
 </html>
