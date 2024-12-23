@@ -216,12 +216,12 @@
             background: linear-gradient(to right, #F50057, #C51162);
         }
 
-        /* Nút Hiển thị Vân Tay từ Google Sheets */
-        #syncGoogleSheetButton {
+        /* Nút Xem danh sách trên Google Sheets */
+        #viewGoogleSheetButton {
             margin: 10px;
             background-color: #3F51B5; /* Màu xanh đậm */
         }
-        #syncGoogleSheetButton:hover {
+        #viewGoogleSheetButton:hover {
             background-color: #303F9F;
         }
 
@@ -358,7 +358,8 @@
                         lastEntryID = latestFeed.entry_id;
                     }
                 }
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('field1').innerText = 'Lỗi';
                 document.getElementById('field2').innerText = 'Lỗi';
@@ -374,8 +375,7 @@
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-                const data = await response.json();
-                let feeds = data.feeds;
+                let feeds = response.json().feeds;
                 if (feeds.length === 0) return;
 
                 // Đảo ngược mảng cho bản ghi mới nằm ở trên
@@ -396,7 +396,8 @@
                 });
 
                 document.getElementById('dataTable').style.display = 'table';
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi lấy dữ liệu:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi tải dữ liệu.';
                 document.getElementById('dataTable').style.display = 'none';
@@ -426,15 +427,15 @@
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-                const data = await response.json();
-                let feeds = data.feeds;
+                let feeds = response.json().feeds;
 
                 if (feeds.length === 0) {
                     document.getElementById('filterMessage').style.color = 'red';
                     document.getElementById('filterMessage').innerText = 'Dữ liệu không tồn tại.';
                     document.getElementById('dataTable').style.display = 'none';
                     return;
-                } else {
+                }
+                else {
                     document.getElementById('filterMessage').style.color = 'green';
                     document.getElementById('filterMessage').innerText = '';
                 }
@@ -472,7 +473,8 @@
                 });
 
                 document.getElementById('dataTable').style.display = 'table';
-            } catch (error) {
+            }
+            catch (error) {
                 console.error('Lỗi khi lấy dữ liệu lịch sử:', error);
                 document.getElementById('filterMessage').innerText = 'Có lỗi xảy ra khi lọc dữ liệu.';
                 document.getElementById('dataTable').style.display = 'none';
@@ -486,7 +488,8 @@
                 dataTable.style.display = 'table';
                 toggleButton.innerText = 'Ẩn bảng dữ liệu';
                 await fetchAllData();
-            } else {
+            }
+            else {
                 dataTable.style.display = 'none';
                 toggleButton.innerText = 'Hiển thị danh sách';
             }
@@ -525,7 +528,8 @@
                 document.getElementById('endDate').value = formatDate(maxAllowedDate).split(' ')[0];
                 filterMessage.style.color = 'orange';
                 filterMessage.innerText = `Ngày kết thúc đã được giới hạn tại ${formatDate(maxAllowedDate).split(' ')[0]}.`;
-            } else {
+            }
+            else {
                 filterMessage.style.color = 'green';
                 filterMessage.innerText = '';
             }
@@ -574,39 +578,11 @@
         }
 
         async function fetchGoogleSheetData() {
-            const url = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Thay YOUR_GOOGLE_APPS_SCRIPT_URL bằng URL Web App của bạn
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                
-                const data = await response.json();
-                populateFingerprintTable(data);
-            } catch (error) {
-                console.error('Lỗi khi lấy dữ liệu từ Google Sheets:', error);
-                alert('Có lỗi xảy ra khi lấy dữ liệu.');
-            }
+            // Hàm này đã bị xóa theo yêu cầu của bạn
         }
 
         function populateFingerprintTable(data) {
-            const tableBody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = '';
-
-            data.forEach(entry => {
-                const row = tableBody.insertRow();
-
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-                const cell3 = row.insertCell(2);
-                const cell4 = row.insertCell(3);
-
-                cell1.innerText = entry['ESP ID'] || 'Không có dữ liệu';
-                cell2.innerText = entry['Fingerprint ID'] || 'Không có dữ liệu';
-                cell3.innerText = entry['Timestamp'] || 'Không có dữ liệu';
-                cell4.innerText = entry['Action'] || 'Không có dữ liệu';
-            });
-
-            document.getElementById('dataTable').style.display = 'table';
+            // Hàm này đã bị xóa theo yêu cầu của bạn
         }
 
         function sendDeleteFingerprintFromHTML() {
@@ -722,6 +698,11 @@
             }
         }
 
+        // Thêm hàm mới để mở Google Sheets
+        function openGoogleSheet() {
+            window.open('https://docs.google.com/spreadsheets/d/1lQY8EePtReV2xUUVGj-My3vofBUwzeUHRAYnT1-E5s4/edit?gid=0#gid=0', '_blank');
+        }
+
         window.addEventListener('load', function() {
             // Giới hạn endDate ban đầu
             const endDateInputElement = document.getElementById('endDate');
@@ -755,8 +736,8 @@
                 window.open('https://thingspeak.mathworks.com/channels/2783657', '_blank');
             });
 
-            // Gán event cho nút Hiển thị Vân Tay từ Google Sheets
-            document.getElementById('syncGoogleSheetButton').addEventListener('click', fetchGoogleSheetData);
+            // Thêm event cho nút Xem danh sách trên Google Sheets
+            document.getElementById('viewGoogleSheetButton').addEventListener('click', openGoogleSheet);
         });
     </script>
 </head>
@@ -804,7 +785,8 @@
         <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
         <button id="deleteFingerprintButton">Xóa Vân Tay</button>
         <button id="viewThingSpeakButton">Xem trên ThingSpeak</button>
-        <button id="syncGoogleSheetButton">Hiển thị Vân Tay từ Google Sheets</button> <!-- Nút mới thêm vào -->
+        <!-- Thay nút Hiển thị Vân Tay từ Google Sheets bằng nút mới -->
+        <button id="viewGoogleSheetButton">Xem danh sách trên Google Sheets</button> <!-- Nút mới thêm vào -->
     </div>
 
     <table id="dataTable">
