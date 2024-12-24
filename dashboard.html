@@ -89,7 +89,7 @@
             color: #555;
         }
 
-        /* 4 khung với 4 màu nền khác nhau */
+        /* 3 khung với 3 màu nền khác nhau */
         .data-container .data-item:nth-child(1) {
             background: linear-gradient(to bottom right, #FDE68A, #FCD34D); /* Khung ESP ID: pastel vàng */
         }
@@ -210,7 +210,7 @@
         /* Nút Xem ThingSpeak */
         #viewThingSpeakButton {
             margin: 10px;
-            background: linear-gradient(to right, #FF8A80, #FF4081); /* Gradient xanh dương */
+            background: linear-gradient(to right, #FF8A80, #FF4081); /* Gradient hồng */
         }
         #viewThingSpeakButton:hover {
             background: linear-gradient(to right, #F50057, #C51162);
@@ -280,6 +280,7 @@
             100% { transform: translateX(-100%); }
         }
     </style>
+
     <script>
         let lastEntryID = null;
         let maxEndDate = formatDate(new Date()); // 'DD/MM/YYYY HH:MM:SS'
@@ -328,17 +329,19 @@
             cell4.innerText = action;
         }
 
+        // Lấy dữ liệu mới nhất (field1 & field2) hiển thị ở 2 ô đầu
         async function fetchData() {
-            const channelID = '2783657';
-            const apiKey = 'FZUQDUYN7ON76T8P';
+            const channelID = '2783657';  // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P'; // Thay bằng Read API Key của bạn
             const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=20`;
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-                const data = await response.json();
-                const feeds = data.feeds;
+                // Thêm await ở đây
+                const data = await response.json(); 
+                const feeds = data.feeds; 
                 if (feeds.length === 0) return;
 
                 const latestFeed = feeds[feeds.length - 1];
@@ -352,7 +355,7 @@
                             latestFeed.field1 || 'Không có dữ liệu',
                             latestFeed.field2 || 'Không có dữ liệu',
                             latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu',
-                            'Addition', // Hoặc 'Deletion' tùy thuộc vào trường hợp
+                            'Addition', 
                             true
                         );
                         lastEntryID = latestFeed.entry_id;
@@ -366,16 +369,20 @@
             }
         }
 
+        // Lấy tất cả dữ liệu (tối đa 8000 bản ghi)
         async function fetchAllData() {
-            const channelID = '2783657';
-            const apiKey = 'FZUQDUYN7ON76T8P';
+            const channelID = '2783657';  // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P'; // Thay bằng Read API Key của bạn
             const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${apiKey}&results=8000`;
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-                let feeds = response.json().feeds;
+                // Thêm await ở đây
+                const data = await response.json(); 
+                let feeds = data.feeds; 
+
                 if (feeds.length === 0) return;
 
                 // Đảo ngược mảng cho bản ghi mới nằm ở trên
@@ -404,9 +411,10 @@
             }
         }
 
+        // Lọc dữ liệu theo khoảng thời gian
         async function fetchHistoricalData(startDateStr, endDateStr) {
-            const channelID = '2783657';
-            const apiKey = 'FZUQDUYN7ON76T8P';
+            const channelID = '2783657';  // Thay bằng Channel ID của bạn
+            const apiKey = 'FZUQDUYN7ON76T8P'; // Thay bằng Read API Key của bạn
 
             const startDate = parseDate(startDateStr);
             const endDate = parseDate(endDateStr);
@@ -427,7 +435,9 @@
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-                let feeds = response.json().feeds;
+                // Thêm await ở đây
+                const data = await response.json(); 
+                let feeds = data.feeds; 
 
                 if (feeds.length === 0) {
                     document.getElementById('filterMessage').style.color = 'red';
@@ -481,6 +491,7 @@
             }
         }
 
+        // Bật/tắt hiển thị bảng
         async function toggleTable() {
             const dataTable = document.getElementById('dataTable');
             const toggleButton = document.getElementById('toggleButton');
@@ -495,6 +506,7 @@
             }
         }
 
+        // Lọc dữ liệu khi nhấn nút "Lọc dữ liệu"
         async function filterData() {
             const startDateInput = document.getElementById('startDate').value;
             let endDateInput = document.getElementById('endDate').value;
@@ -537,22 +549,21 @@
             await fetchHistoricalData(startDateInput, endDateInput);
         }
 
+        // Các lệnh điều khiển gửi đến ESP
         function sendRegisterFingerprintCommand() {
             window.location.href = 'http://192.168.133.110/register_fingerprint?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY
         }
-
         function sendCancelRegisterCommand() {
             window.location.href = 'http://192.168.133.110/cancel_register?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY
         }
-
         function sendEmergencyOpenCommand() {
             window.location.href = 'http://192.168.133.110/emergency_open?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY
         }
-
         function sendDeleteFingerprintCommand() {
             window.location.href = 'http://192.168.133.110/delete_fingerprint?key=YOUR_SECRET_KEY'; // Thay YOUR_SECRET_KEY
         }
 
+        // Thiết lập ngày kết thúc tối đa
         function setMaxEndDate() {
             const maxEndDateInput = document.getElementById('maxEndDateInput').value;
             const setMaxEndDateMessage = document.getElementById('setMaxEndDateMessage');
@@ -577,27 +588,13 @@
             setMaxEndDateMessage.innerText = `Ngày kết thúc tối đa đã được thiết lập tại ${maxEndDate.split(' ')[0]}.`;
         }
 
-        async function fetchGoogleSheetData() {
-            // Hàm này đã bị xóa theo yêu cầu của bạn
-        }
-
-        function populateFingerprintTable(data) {
-            // Hàm này đã bị xóa theo yêu cầu của bạn
-        }
-
-        function sendDeleteFingerprintFromHTML() {
-            // Hàm này có thể được sử dụng để gửi yêu cầu xóa từ giao diện HTML nếu cần
-        }
-
-        function sendDataToGoogleSheets(action) {
-            // Hàm này có thể được sử dụng để gửi dữ liệu từ giao diện HTML nếu cần
-        }
-
+        // Tự động gọi fetchData định kỳ để cập nhật field1, field2
         function startAutoUpdate() {
             fetchData();
             setInterval(fetchData, 3000);
         }
 
+        // Đồng hồ hiển thị thời gian thực
         function startLiveClock() {
             const liveClockElement = document.getElementById('liveClock');
             function updateClock() {
@@ -691,6 +688,7 @@
             });
         }
 
+        // Kiểm tra trạng thái đăng nhập
         function checkLoginStatus() {
             const isLoggedIn = sessionStorage.getItem('isLoggedIn');
             if (isLoggedIn !== 'true') {
@@ -698,17 +696,18 @@
             }
         }
 
-        // Thêm hàm mới để mở Google Sheets
+        // Mở Google Sheets
         function openGoogleSheet() {
             window.open('https://docs.google.com/spreadsheets/d/1lQY8EePtReV2xUUVGj-My3vofBUwzeUHRAYnT1-E5s4/edit?gid=0#gid=0', '_blank');
         }
 
+        // Khi tải trang
         window.addEventListener('load', function() {
             // Giới hạn endDate ban đầu
             const endDateInputElement = document.getElementById('endDate');
             endDateInputElement.setAttribute('max', maxEndDate.split(' ')[0]);
 
-            // Gắn autoFormatDate cho 3 ô
+            // Gắn autoFormatDate cho 3 ô input
             const dateInputs = ['startDate', 'endDate', 'maxEndDateInput'];
             dateInputs.forEach(id => {
                 const input = document.getElementById(id);
@@ -736,14 +735,14 @@
                 window.open('https://thingspeak.mathworks.com/channels/2783657', '_blank');
             });
 
-            // Thêm event cho nút Xem danh sách trên Google Sheets
+            // Nút Xem Google Sheets
             document.getElementById('viewGoogleSheetButton').addEventListener('click', openGoogleSheet);
         });
     </script>
 </head>
 <body>
     <h1>
-       Tang điều khiển cửa vân tay
+       Tang điều khiển cửa vân tay 1111
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
 
@@ -785,8 +784,8 @@
         <button id="emergencyOpenButton">Mở Cửa Khẩn Cấp</button>
         <button id="deleteFingerprintButton">Xóa Vân Tay</button>
         <button id="viewThingSpeakButton">Xem trên ThingSpeak</button>
-        <!-- Thay nút Hiển thị Vân Tay từ Google Sheets bằng nút mới -->
-        <button id="viewGoogleSheetButton">Xem danh sách trên Google Sheets</button> <!-- Nút mới thêm vào -->
+        <!-- Nút xem Google Sheets -->
+        <button id="viewGoogleSheetButton">Xem danh sách trên Google Sheets</button>
     </div>
 
     <table id="dataTable">
@@ -795,7 +794,7 @@
                 <th>ESP ID</th>
                 <th>Fingerprint ID</th>
                 <th>Thời gian</th>
-                <th>Hành động</th> <!-- Thêm cột Hành động -->
+                <th>Hành động</th>
             </tr>
         </thead>
         <tbody>
