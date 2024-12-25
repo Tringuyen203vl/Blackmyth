@@ -282,6 +282,9 @@
     </style>
 
     <script>
+        // Danh sách các ID vân tay được phép (phải trùng với ESP code)
+        const allowedFingerprints = [1, 2, 5];
+
         let lastEntryID = null;
         let maxEndDate = formatDate(new Date()); // 'DD/MM/YYYY HH:MM:SS'
 
@@ -315,6 +318,12 @@
         }
 
         function addRowToTable(field1, field2, timestamp, action, insertAtTop = false) {
+            const fingerprintID = parseInt(field2);
+            if (!allowedFingerprints.includes(fingerprintID)) {
+                // Nếu ID vân tay không được phép, không thêm vào bảng
+                return;
+            }
+
             const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
             const newRow = insertAtTop ? table.insertRow(0) : table.insertRow(-1);
 
@@ -339,7 +348,6 @@
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-                // Thêm await ở đây
                 const data = await response.json(); 
                 const feeds = data.feeds; 
                 if (feeds.length === 0) return;
@@ -348,7 +356,7 @@
                 document.getElementById('field1').innerText = latestFeed.field1 || 'Không có dữ liệu';
                 document.getElementById('field2').innerText = latestFeed.field2 || 'Không có dữ liệu';
 
-                // Cập nhật vào bảng nếu đang hiển thị
+                // Cập nhật vào bảng nếu đang hiển thị và vân tay được phép
                 if (document.getElementById('dataTable').style.display === 'table') {
                     if (latestFeed.entry_id !== lastEntryID) {
                         addRowToTable(
@@ -379,7 +387,6 @@
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-                // Thêm await ở đây
                 const data = await response.json(); 
                 let feeds = data.feeds; 
 
@@ -392,11 +399,10 @@
                 tableBody.innerHTML = '';
 
                 feeds.forEach(feed => {
-                    const createdAtDate = feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu';
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
-                        createdAtDate,
+                        feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu',
                         feed.field4 || 'Van tay hop le' // Giả sử field4 chứa hành động
                     );
                     lastEntryID = feed.entry_id;
@@ -435,7 +441,6 @@
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-                // Thêm await ở đây
                 const data = await response.json(); 
                 let feeds = data.feeds; 
 
@@ -472,11 +477,10 @@
                 tableBody.innerHTML = '';
 
                 feeds.forEach(feed => {
-                    const createdAtDate = feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu';
                     addRowToTable(
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
-                        createdAtDate,
+                        feed.created_at ? formatDate(new Date(feed.created_at)) : 'Không có dữ liệu',
                         feed.field4 || 'Van tay hop le' // Giả sử field4 chứa hành động
                     );
                     lastEntryID = feed.entry_id;
@@ -742,7 +746,7 @@
 </head>
 <body>
     <h1>
-       Tang điều khiển cửa vân tay 
+       Trang điều khiển cửa vân tay 
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
 
