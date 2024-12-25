@@ -355,7 +355,7 @@
                             latestFeed.field1 || 'Không có dữ liệu',
                             latestFeed.field2 || 'Không có dữ liệu',
                             latestFeed.created_at ? formatDate(new Date(latestFeed.created_at)) : 'Không có dữ liệu',
-                            'Addition', 
+                            'Van tay hop le', 
                             true
                         );
                         lastEntryID = latestFeed.entry_id;
@@ -397,7 +397,7 @@
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
                         createdAtDate,
-                        feed.field4 || 'Addition' // Giả sử field4 chứa hành động
+                        feed.field4 || 'Van tay hop le' // Giả sử field4 chứa hành động
                     );
                     lastEntryID = feed.entry_id;
                 });
@@ -477,7 +477,7 @@
                         feed.field1 || 'Không có dữ liệu',
                         feed.field2 || 'Không có dữ liệu',
                         createdAtDate,
-                        feed.field4 || 'Addition' // Giả sử field4 chứa hành động
+                        feed.field4 || 'Van tay hop le' // Giả sử field4 chứa hành động
                     );
                     lastEntryID = feed.entry_id;
                 });
@@ -742,7 +742,7 @@
 </head>
 <body>
     <h1>
-       Tang điều khiển cửa vân tay 1
+       Tang điều khiển cửa vân tay 
         <button id="logoutButton">Đăng Xuất</button>
     </h1>
 
